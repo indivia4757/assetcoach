@@ -6,8 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.assetcoach.data.db.dao.CategoryDao
+import com.assetcoach.data.db.dao.ChatDao
 import com.assetcoach.data.db.dao.TransactionDao
 import com.assetcoach.data.db.entity.CategoryEntity
+import com.assetcoach.data.db.entity.ConversationEntity
+import com.assetcoach.data.db.entity.MessageEntity
 import com.assetcoach.data.db.entity.TransactionEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,14 +19,20 @@ import kotlinx.coroutines.launch
 import net.sqlcipher.database.SupportFactory
 
 @Database(
-    entities = [TransactionEntity::class, CategoryEntity::class],
-    version = 1,
+    entities = [
+        TransactionEntity::class,
+        CategoryEntity::class,
+        ConversationEntity::class,
+        MessageEntity::class
+    ],
+    version = 2,
     exportSchema = false
 )
 abstract class AssetCoachDatabase : RoomDatabase() {
 
     abstract fun transactionDao(): TransactionDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun chatDao(): ChatDao
 
     companion object {
         private const val DB_NAME = "assetcoach.enc.db"
@@ -56,6 +65,7 @@ abstract class AssetCoachDatabase : RoomDatabase() {
                 DB_NAME
             )
                 .openHelperFactory(factory)
+                .fallbackToDestructiveMigration()  // Phase 3: 스키마 v2 — 개발 단계에서는 자동 재생성
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         val instance = INSTANCE ?: return

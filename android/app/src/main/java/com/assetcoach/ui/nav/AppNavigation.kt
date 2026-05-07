@@ -22,6 +22,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.assetcoach.domain.model.HomeData
 import com.assetcoach.ui.screens.AnalysisScreen
+import com.assetcoach.ui.screens.ChatScreen
 import com.assetcoach.ui.screens.HomeScreen
 import com.assetcoach.ui.theme.AppType
 import com.assetcoach.ui.theme.Cream
@@ -100,7 +101,9 @@ fun AppNavigation(
                 )
             }
             composable(AppTab.Analysis.route) { AnalysisScreen() }
-            composable(AppTab.Chat.route) { PlaceholderScreen("상담") }
+            composable(AppTab.Chat.route) {
+                ChatScreen(segmentId = homeData.segmentId, nameLabel = homeData.nameLabel)
+            }
             composable(AppTab.Goals.route) { PlaceholderScreen("목표") }
         }
     }

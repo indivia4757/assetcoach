@@ -12,7 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class AppLockManager {
 
-    private val _state = MutableStateFlow<LockState>(LockState.Locked)
+    // Phase 2.5: 기본값 Unlocked. 사용자가 설정에서 잠금 활성화 (옵트인) — Phase 4 에 토글 추가 예정.
+    private val _state = MutableStateFlow<LockState>(LockState.Unlocked)
     val state: StateFlow<LockState> = _state.asStateFlow()
 
     fun unlock() {
