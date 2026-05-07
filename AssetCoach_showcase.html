@@ -1,0 +1,2700 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AssetCoach — 설계 문서 VOL. 01</title>
+<link rel="icon" type="image/svg+xml" href="AssetCoach_app_icon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Serif+KR:wght@300;400;500;700;900&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+
+<style>
+/* ============================================================
+   AssetCoach 설계 문서 쇼케이스
+   에디토리얼 매거진 스타일 — 단일 HTML
+   ============================================================ */
+
+:root {
+  /* Palette */
+  --cream: #F7F3EC;
+  --cream-deep: #EFE8DA;
+  --paper: #FAF6EE;
+  --forest: #1C2A1E;
+  --forest-soft: #2E3F30;
+  --terracotta: #C66A4A;
+  --terracotta-deep: #A85536;
+  --mustard: #D4AF6A;
+  --mustard-deep: #B8934B;
+  --ink: #14201B;
+  --faint: rgba(28, 42, 30, 0.12);
+  --faint-2: rgba(28, 42, 30, 0.24);
+  --highlight: #F0E5CE;
+
+  /* Typography */
+  --serif-kr: "Gowun Batang", "Noto Serif KR", serif;
+  --serif-kr-alt: "Noto Serif KR", serif;
+  --sans-kr: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --serif-en: "Fraunces", "Gowun Batang", serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Scale */
+  --max-w: 1280px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--forest);
+  font-family: var(--sans-kr);
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Paper grain overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.16 0 0 0 0 0.12 0 0 0 0.28 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Vignette */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(28,42,30,0.08) 100%);
+}
+
+/* ------------------------------------------------------------
+   Typography helpers
+   ------------------------------------------------------------ */
+.display {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  color: var(--forest);
+}
+
+.serif-en {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-optical-sizing: auto;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.rule {
+  height: 1px;
+  background: var(--forest);
+  opacity: 0.9;
+}
+
+.rule-thin { background: var(--faint); }
+
+/* ------------------------------------------------------------
+   Masthead
+   ------------------------------------------------------------ */
+.masthead {
+  border-bottom: 1px solid var(--forest);
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  background: var(--cream);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  background: rgba(247, 243, 236, 0.92);
+}
+
+.masthead a { color: var(--forest); text-decoration: none; }
+.masthead a:hover { color: var(--terracotta); }
+
+.masthead nav {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+
+.masthead .brand {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.masthead .brand sup {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-size: 10px;
+  margin-left: 4px;
+  color: var(--terracotta);
+}
+
+.masthead .brand-mark {
+  width: 32px;
+  height: 32px;
+  display: block;
+  filter: drop-shadow(0 1px 3px rgba(28, 42, 30, 0.14));
+}
+
+@media (max-width: 820px) {
+  .masthead nav { display: none; }
+}
+
+/* ------------------------------------------------------------
+   Marquee banner
+   ------------------------------------------------------------ */
+.marquee-wrap {
+  background: var(--forest);
+  color: var(--cream);
+  overflow: hidden;
+  border-bottom: 1px solid var(--forest);
+}
+.marquee {
+  display: flex;
+  gap: 56px;
+  padding: 12px 0;
+  animation: marquee 46s linear infinite;
+  width: max-content;
+  font-family: var(--serif-kr);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.marquee span { display: inline-flex; align-items: center; gap: 56px; }
+.marquee em {
+  font-family: var(--serif-en);
+  font-style: italic;
+  color: var(--mustard);
+  font-weight: 500;
+}
+.marquee .dot { color: var(--terracotta); }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ------------------------------------------------------------
+   Cover
+   ------------------------------------------------------------ */
+.cover {
+  padding: 80px 48px 64px;
+  position: relative;
+  border-bottom: 1px solid var(--forest);
+  overflow: hidden;
+}
+
+.cover .issue-meta {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 24px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 44px;
+  color: var(--forest-soft);
+}
+
+.cover .issue-meta .c { text-align: center; }
+.cover .issue-meta .r { text-align: right; }
+
+.cover .title-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 64px;
+  align-items: end;
+}
+
+.cover h1 {
+  font-family: var(--serif-kr);
+  font-size: clamp(56px, 11vw, 180px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  color: var(--forest);
+  position: relative;
+}
+
+.cover h1 .amp {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--terracotta);
+}
+
+.cover h1 .char {
+  display: inline-block;
+  position: relative;
+}
+.cover h1 .sub-char {
+  position: absolute;
+  top: -18px;
+  right: -10px;
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 0.14em;
+  color: var(--terracotta);
+  letter-spacing: 0;
+}
+
+.cover .subtitle {
+  font-family: var(--serif-kr);
+  font-size: clamp(18px, 2.2vw, 26px);
+  line-height: 1.5;
+  color: var(--forest);
+  margin-top: 28px;
+  max-width: 640px;
+}
+
+.cover .subtitle em {
+  font-family: var(--serif-en);
+  font-style: italic;
+  color: var(--terracotta);
+}
+
+.cover .card {
+  background: var(--paper);
+  border: 1px solid var(--forest);
+  padding: 28px 28px 24px;
+  position: relative;
+  box-shadow: 6px 6px 0 var(--forest);
+}
+
+.cover .card h3 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  margin-bottom: 12px;
+}
+
+.cover .card ul {
+  list-style: none;
+  display: grid;
+  gap: 7px;
+  font-family: var(--serif-kr);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.cover .card ul li {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 8px;
+  align-items: baseline;
+  border-bottom: 1px dashed var(--faint-2);
+  padding-bottom: 6px;
+}
+
+.cover .card ul li:last-child { border: 0; padding-bottom: 0; }
+
+.cover .card ul li .num {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--terracotta);
+}
+
+.cover .card ul li .pg {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--forest-soft);
+}
+
+.cover .kicker {
+  position: absolute;
+  right: 48px;
+  top: 28px;
+  writing-mode: vertical-rl;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--forest-soft);
+}
+
+@media (max-width: 920px) {
+  .cover { padding: 56px 28px 40px; }
+  .cover .title-grid { grid-template-columns: 1fr; gap: 40px; }
+  .cover .kicker { display: none; }
+}
+
+/* ------------------------------------------------------------
+   Section scaffold
+   ------------------------------------------------------------ */
+section.spread {
+  padding: 96px 48px 112px;
+  border-bottom: 1px solid var(--faint);
+  position: relative;
+}
+
+section.spread.dark {
+  background: var(--forest);
+  color: var(--cream);
+  border-color: var(--forest);
+}
+
+.section-head {
+  display: grid;
+  grid-template-columns: 160px 1fr auto;
+  align-items: baseline;
+  gap: 32px;
+  margin-bottom: 56px;
+}
+
+.section-head .num {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 72px;
+  color: var(--terracotta);
+  line-height: 1;
+}
+section.dark .section-head .num { color: var(--mustard); }
+
+.section-head .lbl {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--forest-soft);
+  margin-top: 6px;
+}
+section.dark .section-head .lbl { color: rgba(247, 243, 236, 0.6); }
+
+.section-head h2 {
+  font-family: var(--serif-kr);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.section-head .side {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--forest-soft);
+  text-align: right;
+  max-width: 200px;
+}
+section.dark .section-head .side { color: rgba(247, 243, 236, 0.55); }
+
+@media (max-width: 820px) {
+  section.spread { padding: 64px 28px 80px; }
+  .section-head { grid-template-columns: auto 1fr; gap: 16px; }
+  .section-head .side { display: none; }
+  .section-head .num { font-size: 48px; }
+}
+
+/* ------------------------------------------------------------
+   §1 Manifesto
+   ------------------------------------------------------------ */
+.manifesto {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 72px;
+  align-items: start;
+}
+
+.manifesto .lead {
+  font-family: var(--serif-kr);
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--forest);
+  letter-spacing: -0.01em;
+}
+
+.manifesto .lead em {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--terracotta);
+}
+
+.manifesto .lead strong {
+  font-weight: 700;
+  background: linear-gradient(180deg, transparent 60%, var(--highlight) 60%);
+}
+
+.manifesto .body {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--forest);
+  column-count: 1;
+  margin-top: 6px;
+}
+
+.manifesto .body p + p { margin-top: 16px; }
+
+.manifesto .body p::first-letter {
+  font-family: var(--serif-kr);
+  font-size: 1.6em;
+  font-weight: 700;
+  color: var(--terracotta);
+  margin-right: 2px;
+}
+
+.pillars {
+  margin-top: 64px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--forest);
+  border-bottom: 1px solid var(--forest);
+}
+
+.pillar {
+  padding: 32px 24px 36px;
+  border-right: 1px solid var(--faint);
+  position: relative;
+}
+.pillar:last-child { border-right: 0; }
+
+.pillar .n {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 44px;
+  color: var(--terracotta);
+  line-height: 1;
+}
+
+.pillar h4 {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 22px;
+  margin: 18px 0 10px;
+  letter-spacing: -0.01em;
+}
+
+.pillar p {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--forest-soft);
+}
+
+@media (max-width: 980px) {
+  .manifesto { grid-template-columns: 1fr; gap: 40px; }
+  .pillars { grid-template-columns: repeat(2, 1fr); }
+  .pillar:nth-child(2) { border-right: 0; }
+  .pillar:nth-child(1), .pillar:nth-child(2) { border-bottom: 1px solid var(--faint); }
+}
+
+/* ------------------------------------------------------------
+   §2 Design System
+   ------------------------------------------------------------ */
+.design-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 56px;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border: 1px solid var(--forest);
+}
+
+.swatch {
+  aspect-ratio: 3/4;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid var(--faint);
+  color: var(--forest);
+}
+.swatch:last-child { border-right: 0; }
+.swatch .t {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.swatch .name {
+  font-family: var(--serif-kr);
+  font-size: 16px;
+  font-weight: 700;
+}
+.swatch .hex {
+  font-family: var(--mono);
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.swatch.cream { background: var(--cream); }
+.swatch.terracotta { background: var(--terracotta); color: var(--cream); }
+.swatch.terracotta .hex { opacity: 0.85; }
+.swatch.mustard { background: var(--mustard); color: var(--forest); }
+.swatch.forest { background: var(--forest); color: var(--cream); }
+.swatch.forest .hex { opacity: 0.75; }
+
+.type-specimen {
+  border: 1px solid var(--forest);
+  padding: 28px;
+  background: var(--paper);
+  display: grid;
+  gap: 24px;
+}
+
+.type-row {
+  border-bottom: 1px dashed var(--faint-2);
+  padding-bottom: 18px;
+}
+.type-row:last-child { border: 0; padding-bottom: 0; }
+
+.type-row .lbl {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.type-row .spec {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--forest-soft);
+  letter-spacing: 0.04em;
+}
+
+.type-row .sample-serif {
+  font-family: var(--serif-kr);
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.type-row .sample-sans {
+  font-family: var(--sans-kr);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.type-row .sample-display-en {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 46px;
+  color: var(--terracotta);
+}
+
+.type-row .sample-mono {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 920px) {
+  .design-grid { grid-template-columns: 1fr; gap: 32px; }
+  .swatches { grid-template-columns: repeat(2, 1fr); }
+  .swatches .swatch:nth-child(2) { border-right: 0; }
+  .swatches .swatch:nth-child(1), .swatches .swatch:nth-child(2) {
+    border-bottom: 1px solid var(--faint);
+  }
+}
+
+/* ------------------------------------------------------------
+   §3 Segment Matrix — The 18
+   ------------------------------------------------------------ */
+.axes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.axis {
+  border: 1px solid var(--forest);
+  padding: 22px 22px 24px;
+  background: var(--paper);
+}
+
+.axis .n {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--terracotta);
+}
+
+.axis h4 {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 19px;
+  margin: 4px 0 14px;
+}
+
+.axis .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.axis .chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 4px 9px;
+  border: 1px solid var(--forest);
+  border-radius: 100px;
+  background: var(--cream);
+  text-transform: uppercase;
+}
+
+.segments-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+  border: 1px solid var(--forest);
+  background: var(--paper);
+}
+
+.seg {
+  aspect-ratio: 5/6;
+  padding: 16px 14px 14px;
+  border-right: 1px solid var(--faint);
+  border-bottom: 1px solid var(--faint);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: background 200ms ease, transform 220ms ease;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.seg:hover {
+  background: var(--cream);
+  transform: translateY(-2px);
+}
+
+.seg:nth-child(6n) { border-right: 0; }
+.seg:nth-last-child(-n+6) { border-bottom: 0; }
+
+.seg .id {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--terracotta);
+  font-weight: 600;
+}
+
+.seg h5 {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin-top: 6px;
+}
+
+.seg .meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--forest-soft);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.seg.highlight {
+  background: var(--mustard);
+}
+.seg.highlight:hover { background: var(--mustard); }
+.seg.highlight .id { color: var(--forest); }
+.seg.highlight .meta { color: var(--forest-soft); }
+.seg.highlight::after {
+  content: "★";
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 12px;
+  color: var(--terracotta-deep);
+}
+
+@media (max-width: 1080px) {
+  .segments-grid { grid-template-columns: repeat(3, 1fr); }
+  .seg:nth-child(6n) { border-right: 1px solid var(--faint); }
+  .seg:nth-child(3n) { border-right: 0; }
+  .seg:nth-last-child(-n+6) { border-bottom: 1px solid var(--faint); }
+  .seg:nth-last-child(-n+3) { border-bottom: 0; }
+}
+
+@media (max-width: 640px) {
+  .axes { grid-template-columns: 1fr; }
+  .segments-grid { grid-template-columns: repeat(2, 1fr); }
+  .seg:nth-child(3n) { border-right: 1px solid var(--faint); }
+  .seg:nth-child(2n) { border-right: 0; }
+  .seg:nth-last-child(-n+3) { border-bottom: 1px solid var(--faint); }
+  .seg:nth-last-child(-n+2) { border-bottom: 0; }
+}
+
+/* ------------------------------------------------------------
+   §4 Personas
+   ------------------------------------------------------------ */
+.personas {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--forest);
+  border-bottom: 1px solid var(--forest);
+}
+
+.persona {
+  padding: 28px 24px 32px;
+  border-right: 1px solid var(--faint);
+  position: relative;
+}
+.persona:last-child { border-right: 0; }
+
+.persona .avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--mustard);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif-kr);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--forest);
+  margin-bottom: 18px;
+  border: 1px solid var(--forest);
+}
+
+.persona .code {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--terracotta);
+  margin-bottom: 4px;
+}
+
+.persona h3 {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.persona .meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--forest-soft);
+  letter-spacing: 0.04em;
+  margin-top: 6px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--faint-2);
+  margin-bottom: 14px;
+}
+
+.persona .quote {
+  font-family: var(--serif-kr);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--forest);
+  margin-bottom: 14px;
+  font-style: italic;
+  position: relative;
+  padding-left: 14px;
+}
+.persona .quote::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--terracotta);
+}
+
+.persona .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: auto;
+}
+.persona .tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 3px 7px;
+  background: var(--cream);
+  border: 1px solid var(--faint-2);
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+}
+
+/* persona color accents */
+.persona:nth-child(1) .avatar { background: #E6D3A8; }
+.persona:nth-child(2) .avatar { background: #C6A68E; }
+.persona:nth-child(3) .avatar { background: var(--terracotta); color: var(--cream); }
+.persona:nth-child(4) .avatar { background: #B5A36A; }
+.persona:nth-child(5) .avatar { background: #95A585; color: var(--cream); }
+
+@media (max-width: 1080px) {
+  .personas { grid-template-columns: repeat(2, 1fr); border-top: 0; }
+  .persona { border-right: 1px solid var(--faint); border-bottom: 1px solid var(--faint); }
+  .persona:nth-child(2n) { border-right: 0; }
+  .persona:last-child { border-bottom: 0; }
+}
+
+@media (max-width: 640px) {
+  .personas { grid-template-columns: 1fr; }
+  .persona { border-right: 0; }
+}
+
+/* ------------------------------------------------------------
+   §5 Adaptive Home — Phone mockups
+   ------------------------------------------------------------ */
+.phones-deck {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+  justify-items: center;
+  align-items: start;
+  margin-top: 32px;
+}
+
+.phone-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 260px;
+  width: 100%;
+}
+
+.phone-col .label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  text-align: center;
+}
+
+.phone {
+  width: 100%;
+  aspect-ratio: 9 / 19.5;
+  background: var(--forest);
+  border-radius: 36px;
+  padding: 9px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.04) inset,
+    0 22px 44px -18px rgba(28, 42, 30, 0.32),
+    0 6px 12px -6px rgba(28, 42, 30, 0.18);
+  position: relative;
+  transition: transform 400ms cubic-bezier(.25,.8,.25,1);
+}
+
+.phone:hover { transform: translateY(-6px); }
+
+.phone::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48%;
+  height: 18px;
+  background: var(--forest);
+  border-radius: 0 0 14px 14px;
+  z-index: 2;
+}
+
+.screen {
+  width: 100%;
+  height: 100%;
+  background: var(--cream);
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  font-size: 9px;
+}
+
+.screen .status {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 14px 2px;
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--forest);
+  padding-top: 8px;
+}
+
+.screen .top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 16px 6px;
+}
+
+.screen .brand-tiny {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+.screen .icons-row {
+  display: flex;
+  gap: 6px;
+  font-size: 10px;
+}
+
+.screen .scroll {
+  flex: 1;
+  overflow: hidden;
+  padding: 4px 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.screen h1 {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.screen h1 em {
+  font-style: normal;
+  color: var(--terracotta);
+}
+
+.screen .sub {
+  font-size: 8.5px;
+  color: var(--forest-soft);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.screen .widget {
+  background: var(--paper);
+  border: 1px solid var(--faint-2);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.screen .widget.accent {
+  background: var(--forest);
+  color: var(--cream);
+  border-color: var(--forest);
+}
+
+.screen .widget.terracotta {
+  background: var(--terracotta);
+  color: var(--cream);
+  border-color: var(--terracotta);
+}
+
+.screen .widget.mustard {
+  background: var(--mustard);
+  color: var(--forest);
+  border-color: var(--mustard-deep);
+}
+
+.widget .w-label {
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.widget .big-num {
+  font-family: var(--serif-en);
+  font-weight: 300;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-top: 2px;
+}
+
+.widget .big-num .sm {
+  font-family: var(--serif-kr);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  margin-left: 2px;
+}
+
+.widget .caption {
+  font-size: 8.5px;
+  line-height: 1.35;
+  opacity: 0.88;
+}
+
+.widget .gauge {
+  height: 4px;
+  background: rgba(28,42,30,0.15);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.widget.accent .gauge { background: rgba(247,243,236,0.18); }
+.widget .gauge .fill {
+  height: 100%;
+  background: var(--terracotta);
+  border-radius: 100px;
+}
+.widget.accent .gauge .fill { background: var(--mustard); }
+.widget.terracotta .gauge .fill { background: var(--cream); }
+
+.widget .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 8.5px;
+}
+
+.widget .split-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 100px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.widget .split-bar > div { height: 100%; }
+
+.screen .card-insight {
+  background: var(--paper);
+  border: 1px solid var(--faint-2);
+  border-radius: 10px;
+  padding: 10px 11px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.screen .card-insight .ico {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  background: var(--terracotta);
+  border-radius: 50%;
+  color: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 600;
+}
+.screen .card-insight .txt { flex: 1; font-size: 8.5px; line-height: 1.4; }
+.screen .card-insight .txt strong { font-weight: 700; }
+
+.screen .tabbar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 6px 8px 12px;
+  border-top: 1px solid var(--faint);
+  background: var(--paper);
+  gap: 0;
+}
+.screen .tabbar .t {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--forest-soft);
+  padding: 4px 0;
+}
+.screen .tabbar .t.active { color: var(--terracotta); font-weight: 600; }
+.screen .tabbar .t .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.35;
+}
+.screen .tabbar .t.active .dot { opacity: 1; }
+
+/* 은퇴 모드 (large text mode) */
+.phone.elder .screen { background: var(--paper); }
+.phone.elder .screen h1 { font-size: 17px; line-height: 1.2; }
+.phone.elder .screen .sub { font-size: 10px; }
+.phone.elder .widget { padding: 14px; }
+.phone.elder .widget .big-num { font-size: 34px; }
+.phone.elder .widget .caption { font-size: 10px; }
+.phone.elder .card-insight .txt { font-size: 10px; }
+.phone.elder .tabbar .t { font-size: 9px; }
+
+/* ------------------------------------------------------------
+   §6 Conversation Gallery
+   ------------------------------------------------------------ */
+.convos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.convo {
+  background: var(--paper);
+  border: 1px solid var(--forest);
+  box-shadow: 4px 4px 0 var(--forest);
+  padding: 26px 26px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.convo .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed var(--faint-2);
+  padding-bottom: 14px;
+}
+.convo .head .who {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+}
+.convo .head .seg-lbl {
+  font-family: var(--serif-kr);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.bubble-user, .bubble-ai {
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  max-width: 88%;
+}
+
+.bubble-user {
+  background: var(--forest);
+  color: var(--cream);
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  font-family: var(--serif-kr);
+}
+
+.bubble-ai {
+  background: var(--cream);
+  color: var(--forest);
+  align-self: flex-start;
+  border: 1px solid var(--faint-2);
+  border-bottom-left-radius: 4px;
+}
+
+.bubble-ai strong { font-weight: 700; color: var(--terracotta); }
+.bubble-ai em { font-style: italic; font-family: var(--serif-en); color: var(--terracotta); }
+
+.bubble-ai .choice-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.bubble-ai .ch {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 11px;
+  border: 1px solid var(--forest);
+  border-radius: 100px;
+  background: var(--paper);
+}
+
+.convo-meta {
+  margin-top: 10px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.convo-meta .mt {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  padding: 3px 8px;
+  background: var(--highlight);
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 900px) {
+  .convos { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------
+   §7 IA — 4-tab + onboarding flow
+   ------------------------------------------------------------ */
+.ia-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.tab-structure {
+  border: 1px solid var(--cream);
+  padding: 32px;
+  background: rgba(247,243,236,0.05);
+}
+
+.tab-structure h4 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--mustard);
+  margin-bottom: 22px;
+}
+
+.tabs-viz {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-bottom: 24px;
+  border: 1px solid rgba(247, 243, 236, 0.2);
+}
+
+.tabs-viz .ti {
+  padding: 22px 14px 24px;
+  border-right: 1px solid rgba(247, 243, 236, 0.12);
+  text-align: center;
+}
+.tabs-viz .ti:last-child { border-right: 0; }
+
+.tabs-viz .ti .icon {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 28px;
+  color: var(--mustard);
+}
+
+.tabs-viz .ti h5 {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 16px;
+  margin: 6px 0 4px;
+}
+
+.tabs-viz .ti p {
+  font-size: 11px;
+  color: rgba(247, 243, 236, 0.65);
+  line-height: 1.5;
+}
+
+.tab-detail {
+  display: grid;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.tab-detail .row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(247, 243, 236, 0.12);
+  align-items: baseline;
+}
+.tab-detail .row:last-child { border-bottom: 0; }
+
+.tab-detail .row .l {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--mustard);
+}
+
+.tab-detail .row .r { line-height: 1.55; color: rgba(247, 243, 236, 0.85); }
+
+/* Onboarding */
+.onboarding {
+  border: 1px solid var(--cream);
+  padding: 32px;
+}
+
+.onboarding h4 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--mustard);
+  margin-bottom: 22px;
+}
+
+.steps {
+  display: grid;
+  gap: 0;
+  counter-reset: step;
+}
+
+.step {
+  padding: 18px 0;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 18px;
+  align-items: baseline;
+  border-bottom: 1px solid rgba(247, 243, 236, 0.12);
+}
+.step:last-child { border-bottom: 0; }
+
+.step .n {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 36px;
+  color: var(--mustard);
+  line-height: 1;
+}
+
+.step h5 {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.step p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(247, 243, 236, 0.7);
+}
+
+@media (max-width: 920px) {
+  .ia-wrap { grid-template-columns: 1fr; gap: 32px; }
+  .tabs-viz { grid-template-columns: repeat(2, 1fr); }
+  .tabs-viz .ti:nth-child(2) { border-right: 0; }
+}
+
+/* ------------------------------------------------------------
+   §8 Emotion curve SVG
+   ------------------------------------------------------------ */
+.emotion-chart {
+  border: 1px solid var(--forest);
+  background: var(--paper);
+  padding: 28px 24px 20px;
+  margin-top: 32px;
+}
+
+.emotion-chart svg { width: 100%; height: auto; }
+
+.emotion-legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.emotion-legend .lg {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.emotion-legend .sw {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--forest);
+}
+
+/* ------------------------------------------------------------
+   §9 Safety
+   ------------------------------------------------------------ */
+.safety-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--forest);
+  background: var(--paper);
+}
+
+.safety-col {
+  padding: 32px 28px 34px;
+  border-right: 1px solid var(--faint);
+}
+.safety-col:last-child { border-right: 0; }
+
+.safety-col h4 {
+  font-family: var(--serif-kr);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.safety-col .tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 100px;
+  border: 1px solid currentColor;
+}
+
+.safety-col.ok h4 { color: var(--forest-soft); }
+.safety-col.ok .tag { color: var(--forest-soft); }
+.safety-col.no h4 { color: var(--terracotta-deep); }
+.safety-col.no .tag { color: var(--terracotta-deep); }
+
+.safety-col ul {
+  list-style: none;
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.safety-col li {
+  font-family: var(--serif-kr);
+  font-size: 15px;
+  line-height: 1.5;
+  padding-left: 22px;
+  position: relative;
+}
+
+.safety-col.ok li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--serif-en);
+  color: var(--forest);
+  font-weight: 600;
+}
+.safety-col.no li::before {
+  content: "×";
+  position: absolute;
+  left: 2px;
+  top: -2px;
+  font-family: var(--serif-en);
+  color: var(--terracotta-deep);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+@media (max-width: 780px) {
+  .safety-grid { grid-template-columns: 1fr; }
+  .safety-col { border-right: 0; border-bottom: 1px solid var(--faint); }
+  .safety-col:last-child { border-bottom: 0; }
+}
+
+/* ------------------------------------------------------------
+   Colophon
+   ------------------------------------------------------------ */
+.colophon {
+  background: var(--forest);
+  color: var(--cream);
+  padding: 72px 48px 56px;
+  display: grid;
+  gap: 48px;
+}
+
+.colophon .big {
+  font-family: var(--serif-kr);
+  font-size: clamp(32px, 5.5vw, 72px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.colophon .big em {
+  font-family: var(--serif-en);
+  font-style: italic;
+  color: var(--mustard);
+  font-weight: 400;
+}
+
+.colophon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(247, 243, 236, 0.24);
+}
+
+.col-block h5 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--mustard);
+  margin-bottom: 14px;
+}
+.col-block p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(247, 243, 236, 0.82);
+}
+.col-block ul {
+  list-style: none;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.colophon-foot {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247, 243, 236, 0.5);
+  display: flex;
+  justify-content: space-between;
+  padding-top: 24px;
+  border-top: 1px solid rgba(247, 243, 236, 0.18);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 820px) {
+  .colophon { padding: 48px 28px 40px; }
+  .colophon-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ------------------------------------------------------------
+   Scroll reveal
+   ------------------------------------------------------------ */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 900ms cubic-bezier(.2,.8,.2,1), transform 900ms cubic-bezier(.2,.8,.2,1);
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+/* ------------------------------------------------------------
+   Decorative flourishes
+   ------------------------------------------------------------ */
+.flourish {
+  position: absolute;
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--terracotta);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.aside {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--terracotta);
+  line-height: 1.5;
+  margin-top: 14px;
+}
+
+.small-caps {
+  font-family: var(--serif-en);
+  font-variant: small-caps;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+/* selection */
+::selection { background: var(--terracotta); color: var(--cream); }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     MASTHEAD
+     ============================================================ -->
+<header class="masthead">
+  <div class="brand">
+    <img src="AssetCoach_app_icon.svg" alt="AssetCoach" class="brand-mark" />
+    <span>AssetCoach<sup>vol. 01</sup></span>
+  </div>
+  <nav>
+    <a href="#manifesto">Manifesto</a>
+    <a href="#system">System</a>
+    <a href="#segments">The 18</a>
+    <a href="#personas">Personas</a>
+    <a href="#adaptive">Adaptive Home</a>
+    <a href="#convos">Conversations</a>
+    <a href="#ia">Architecture</a>
+    <a href="#safety">Safety</a>
+  </nav>
+  <div class="mono">APR · 2026</div>
+</header>
+
+<!-- marquee -->
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span>함께 자산을 키워가요 <span class="dot">◆</span> <em>Your AI Coach for Wealth</em> <span class="dot">◆</span> 온디바이스 Gemma 4 <span class="dot">◆</span> 18개 세그먼트 × 3축 성향 <span class="dot">◆</span> 벤치마크·해석형 가이드 <span class="dot">◆</span> 프라이버시 퍼스트 <span class="dot">◆</span></span>
+    <span>함께 자산을 키워가요 <span class="dot">◆</span> <em>Your AI Coach for Wealth</em> <span class="dot">◆</span> 온디바이스 Gemma 4 <span class="dot">◆</span> 18개 세그먼트 × 3축 성향 <span class="dot">◆</span> 벤치마크·해석형 가이드 <span class="dot">◆</span> 프라이버시 퍼스트 <span class="dot">◆</span></span>
+  </div>
+</div>
+
+<!-- ============================================================
+     COVER
+     ============================================================ -->
+<section class="cover">
+  <div class="kicker">No. 01 · Spring Edition · Seoul</div>
+
+  <div class="issue-meta">
+    <div class="l">VOL. 01 · 2026년 봄호</div>
+    <div class="c">A Design Document · 설계 문서</div>
+    <div class="r">ₙₒ. 01 / 06 STEPS</div>
+  </div>
+
+  <div class="title-grid">
+    <div>
+      <h1 class="display">
+        <span class="char">A<span class="sub-char">ssetCoach</span></span>sset<br>
+        <span class="amp">Coach</span>
+      </h1>
+      <p class="subtitle">
+        카드·계좌 내역을 올리면, 온디바이스 AI가 <em>당신의 상황에 맞는</em> 자산 가이드를 함께 찾아드립니다. 토스·뱅샐이 보여주는 앱이라면, AssetCoach는 <em>함께 생각해주는</em> 앱입니다.
+      </p>
+    </div>
+
+    <aside class="card" aria-label="목차">
+      <h3>What's Inside · 목차</h3>
+      <ul>
+        <li><span class="num">01</span><span>Manifesto · 포지셔닝과 네 기둥</span><span class="pg">p. 001</span></li>
+        <li><span class="num">02</span><span>Design Language · 컬러·타이포</span><span class="pg">p. 002</span></li>
+        <li><span class="num">03</span><span>The Eighteen · 세그먼트 매트릭스</span><span class="pg">p. 003</span></li>
+        <li><span class="num">04</span><span>Five Faces · 대표 페르소나 5인</span><span class="pg">p. 004</span></li>
+        <li><span class="num">05</span><span>Adaptive Home · 변주되는 첫 화면</span><span class="pg">p. 005</span></li>
+        <li><span class="num">06</span><span>Conversations · AI 대화 예시</span><span class="pg">p. 006</span></li>
+        <li><span class="num">07</span><span>Architecture · 정보 구조와 온보딩</span><span class="pg">p. 007</span></li>
+        <li><span class="num">08</span><span>Safety · 법적·윤리적 경계</span><span class="pg">p. 008</span></li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     §1 — MANIFESTO
+     ============================================================ -->
+<section id="manifesto" class="spread">
+  <div class="section-head reveal">
+    <div>
+      <div class="num">01</div>
+      <div class="lbl">Chapter · Manifesto</div>
+    </div>
+    <h2>같은 100만원도, <br>사람마다 의미가 다르다.</h2>
+    <div class="side">포지셔닝 · 네 가지 차별점 · 설계 철학</div>
+  </div>
+
+  <div class="manifesto reveal">
+    <p class="lead">
+      사회초년생 지훈에게 100만원은 <em>석 달치 저축</em>이다. 은퇴를 앞둔 영호에게 같은 100만원은 <em>반달치 생활비</em>다. 그 사이에, 맞벌이 민호가 있고 프리랜서 수빈이 있고 교육비가 치솟는 경숙이 있다. <strong>AssetCoach는 절대 기준이 아니라 당신과 같은 상황에 있는 사람들을 기준으로</strong> 숫자를 해석하는 앱이다.
+    </p>
+
+    <div class="body">
+      <p>
+        우리가 본 시장의 빈 칸은 분명했다. 토스와 뱅크샐러드는 당신이 얼마를 어디에 썼는지 <span class="small-caps">보여준다</span>. 그 뒤는 당신의 몫이다. AssetCoach는 한 걸음 더 들어간다. "지난달보다 식비가 12% 늘었어요"가 아니라, "같은 맞벌이 영유아 가정 평균보다 식비는 적절한데, 저축률이 10%p 낮아요. 우리 가족이 놓치고 있는 건 뭘까요?"라고 말한다.
+      </p>
+      <p>
+        그래서 우리는 사용자를 단일한 존재로 다루지 않는다. 생애주기, 수입의 모양, 가족의 구조, 그리고 돈을 쓰는 성향까지 — 네 겹의 해석 위에서만 숫자는 가이드가 된다. 18개의 실질 세그먼트, 3축의 성향 프로파일, 그리고 Gemma 4 온디바이스 언어 모델이 그 해석의 엔진이다.
+      </p>
+      <p class="aside">
+        — 우리가 만들고자 하는 것은 가계부가 아니라, 곁에 있는 어른이다.
+      </p>
+    </div>
+  </div>
+
+  <div class="pillars reveal">
+    <div class="pillar">
+      <div class="n">01</div>
+      <h4>프라이버시 퍼스트</h4>
+      <p>Gemma 4 E4B 모델이 기기 안에서만 동작합니다. 거래 내역은 단 한 번도 서버로 보내지 않습니다. 인터넷이 꺼져 있어도 작동합니다.</p>
+    </div>
+    <div class="pillar">
+      <div class="n">02</div>
+      <h4>대화형</h4>
+      <p>"이번 달 왜 많이 썼어?"라는 질문에 구체적인 날짜·금액과 함께 맥락을 질문합니다. 추궁 대신 공감, 일반론 대신 구체성.</p>
+    </div>
+    <div class="pillar">
+      <div class="n">03</div>
+      <h4>맞춤형</h4>
+      <p>18개 세그먼트와 성향 3축의 조합으로, 같은 상황에 있는 사람들의 벤치마크 위에서 당신의 위치를 해석합니다.</p>
+    </div>
+    <div class="pillar">
+      <div class="n">04</div>
+      <h4>엄격한 분석</h4>
+      <p>중복 거래 자동 감지, 주간·월간 리포트, 재무 건강도 점수. 숫자의 근거가 투명해야 신뢰가 쌓입니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     §2 — DESIGN SYSTEM
+     ============================================================ -->
+<section id="system" class="spread">
+  <div class="section-head reveal">
+    <div>
+      <div class="num">02</div>
+      <div class="lbl">Chapter · Design Language</div>
+    </div>
+    <h2>크림 한 장, <br>테라코타 한 방울.</h2>
+    <div class="side">네 개의 색 · 세 개의 활자 · 하나의 기조</div>
+  </div>
+
+  <div class="design-grid reveal">
+    <div>
+      <div class="swatches">
+        <div class="swatch cream">
+          <div class="t">Primary · Bg</div>
+          <div>
+            <div class="name">크림</div>
+            <div class="hex">#F7F3EC</div>
+          </div>
+        </div>
+        <div class="swatch forest">
+          <div class="t">Text · Ink</div>
+          <div>
+            <div class="name">딥 포레스트</div>
+            <div class="hex">#1C2A1E</div>
+          </div>
+        </div>
+        <div class="swatch terracotta">
+          <div class="t">Brand · Accent</div>
+          <div>
+            <div class="name">테라코타</div>
+            <div class="hex">#C66A4A</div>
+          </div>
+        </div>
+        <div class="swatch mustard">
+          <div class="t">Highlight</div>
+          <div>
+            <div class="name">머스타드</div>
+            <div class="hex">#D4AF6A</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="aside" style="margin-top:18px;">
+        — 종이의 따뜻함을 기본으로, 테라코타로 시선을 찍고, 머스타드로 강조한다. 푸른 기가 단 한 점도 섞이지 않은 팔레트다.
+      </p>
+    </div>
+
+    <div class="type-specimen">
+      <div class="type-row">
+        <div class="lbl"><span>Display · 제목</span><span class="spec">Gowun Batang 700</span></div>
+        <div class="sample-serif">함께 자산을<br>키워가요</div>
+      </div>
+
+      <div class="type-row">
+        <div class="lbl"><span>Accent · 숫자·인용</span><span class="spec">Fraunces Italic 300</span></div>
+        <div class="sample-display-en">Your Coach, Today.</div>
+      </div>
+
+      <div class="type-row">
+        <div class="lbl"><span>Body · 본문</span><span class="spec">Pretendard Variable</span></div>
+        <div class="sample-sans">이번 달은 참 조용한 흐름이에요. 중복 결제 2건을 빼면 지난달보다 34만원 덜 쓰셨어요.</div>
+      </div>
+
+      <div class="type-row">
+        <div class="lbl"><span>Labels · 라벨·코드</span><span class="spec">JetBrains Mono 400</span></div>
+        <div class="sample-mono">SEGMENT S06 · L3 × I1 × H3a</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     §3 — THE 18 SEGMENTS
+     ============================================================ -->
+<section id="segments" class="spread">
+  <div class="section-head reveal">
+    <div>
+      <div class="num">03</div>
+      <div class="lbl">Chapter · The Eighteen</div>
+    </div>
+    <h2>세 개의 축, <br>열여덟 개의 얼굴.</h2>
+    <div class="side">생애주기 × 수입 패턴 × 가구 구성</div>
+  </div>
+
+  <div class="axes reveal">
+    <div class="axis">
+      <div class="n">Axis · A</div>
+      <h4>생애주기 · Life Stage</h4>
+      <div class="chips">
+        <span class="chip">L1 형성기</span>
+        <span class="chip">L2 축적 초기</span>
+        <span class="chip">L3 축적 본격</span>
+        <span class="chip">L4 병행기</span>
+        <span class="chip">L5 은퇴 전환</span>
+        <span class="chip">L6 은퇴 생활</span>
+      </div>
+    </div>
+    <div class="axis">
+      <div class="n">Axis · B</div>
+      <h4>수입 패턴 · Income</h4>
+      <div class="chips">
+        <span class="chip">I1 월급 안정</span>
+        <span class="chip">I2 월급 특수</span>
+        <span class="chip">I3 변동형</span>
+        <span class="chip">I4 고소득 전문</span>
+        <span class="chip">I5 비정기</span>
+        <span class="chip">I6 연금·자산</span>
+      </div>
+    </div>
+    <div class="axis">
+      <div class="n">Axis · C</div>
+      <h4>가구 구성 · Household</h4>
+      <div class="chips">
+        <span class="chip">H1 1인</span>
+        <span class="chip">H2 DINK</span>
+        <span class="chip">H3a 영유아</span>
+        <span class="chip">H3b 초중</span>
+        <span class="chip">H3c 고·대학</span>
+        <span class="chip">H3d 독립</span>
+        <span class="chip">H4 3세대</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="segments-grid reveal">
+    <div class="seg"><div class="id">S01</div><h5>사회초년생<br>싱글</h5><div class="meta">L1 · I1 · H1</div></div>
+    <div class="seg"><div class="id">S02</div><h5>대학생·<br>취준생</h5><div class="meta">L1 · I5 · H1</div></div>
+    <div class="seg"><div class="id">S03</div><h5>축적 초기<br>직장인</h5><div class="meta">L2 · I1 · H1</div></div>
+    <div class="seg"><div class="id">S04</div><h5>프리랜서<br>싱글</h5><div class="meta">L2 · I3 · H1</div></div>
+    <div class="seg"><div class="id">S05</div><h5>신혼 DINK</h5><div class="meta">L2–3 · I1² · H2</div></div>
+    <div class="seg highlight"><div class="id">S06</div><h5>영유아 가구<br>맞벌이</h5><div class="meta">L3 · I1 · H3a</div></div>
+    <div class="seg"><div class="id">S07</div><h5>영유아 가구<br>외벌이</h5><div class="meta">L3 · I1 · H3a</div></div>
+    <div class="seg"><div class="id">S08</div><h5>초중학 자녀<br>가구</h5><div class="meta">L3–4 · I1 · H3b</div></div>
+    <div class="seg"><div class="id">S09</div><h5>교육비 피크<br>가구</h5><div class="meta">L4 · I1 · H3c</div></div>
+    <div class="seg"><div class="id">S10</div><h5>공무원·교사<br>가구</h5><div class="meta">L3–4 · I2 · H3</div></div>
+    <div class="seg"><div class="id">S11</div><h5>자영업자<br>가족</h5><div class="meta">L3–4 · I3 · H3</div></div>
+    <div class="seg"><div class="id">S12</div><h5>고소득 전문직<br>DINK</h5><div class="meta">L3 · I4 · H2</div></div>
+    <div class="seg"><div class="id">S13</div><h5>전문직<br>자녀 유</h5><div class="meta">L3–4 · I4 · H3</div></div>
+    <div class="seg"><div class="id">S14</div><h5>은퇴 준비기<br>직장인</h5><div class="meta">L5 · I1 · H3c–d</div></div>
+    <div class="seg"><div class="id">S15</div><h5>은퇴 준비기<br>자영업</h5><div class="meta">L5 · I3 · H3c–d</div></div>
+    <div class="seg"><div class="id">S16</div><h5>조기 은퇴자<br>FIRE</h5><div class="meta">L3–4 · I6 · H1–2</div></div>
+    <div class="seg"><div class="id">S17</div><h5>은퇴 생활기<br>부부</h5><div class="meta">L6 · I6 · H2</div></div>
+    <div class="seg"><div class="id">S18</div><h5>경력단절<br>재취업 준비</h5><div class="meta">L2–4 · I5 · H3</div></div>
+  </div>
+
+  <p class="aside" style="margin-top: 22px; text-align:right;">
+    ★ 표시된 S06은 원형 페르소나(민호). <br>
+    252개 이론 조합 중 한국 인구 분포·금융 행동 기준으로 18개로 압축.
+  </p>
+</section>
+
+<!-- ============================================================
+     §4 — FIVE FACES / PERSONAS
+     ============================================================ -->
+<section id="personas" class="spread">
+  <div class="section-head reveal">
+    <div>
+      <div class="num">04</div>
+      <div class="lbl">Chapter · Five Faces</div>
+    </div>
+    <h2>다섯 사람, <br>다섯 가지 곡선.</h2>
+    <div class="side">각 세그먼트의 대표 페르소나와 감정 여정</div>
+  </div>
+
+  <div class="personas reveal">
+
+    <article class="persona">
+      <div class="avatar">지</div>
+      <div class="code">S01 · 사회초년생</div>
+      <h3>지훈 · 26</h3>
+      <div class="meta">IT 주니어 · 원룸 자취 · 2년차</div>
+      <p class="quote">월급이 왜 이렇게 빨리 사라지는지 모르겠어요.</p>
+      <p style="font-size: 12.5px; line-height: 1.6; color: var(--forest-soft); margin-bottom: 14px;">
+        또래보다 어디쯤 있는지 궁금한 세대. 첫 100만원 달성이 Aha의 방아쇠.
+      </p>
+      <div class="tags">
+        <span class="tag">또래 비교</span>
+        <span class="tag">저축 습관</span>
+        <span class="tag">마일스톤</span>
+      </div>
+    </article>
+
+    <article class="persona">
+      <div class="avatar">수</div>
+      <div class="code">S04 · 프리랜서</div>
+      <h3>수빈 · 31</h3>
+      <div class="meta">UX 디자이너 · 월 수입 편차 ±210만원</div>
+      <p class="quote">다음 달 수입이 들어올지 모르겠어요.</p>
+      <p style="font-size: 12.5px; line-height: 1.6; color: var(--forest-soft); margin-bottom: 14px;">
+        변동성을 정상으로 받아들이는 앱을 기다렸다. 분기 뷰와 세금 버퍼가 핵심.
+      </p>
+      <div class="tags">
+        <span class="tag">분기 뷰</span>
+        <span class="tag">세금 버퍼</span>
+        <span class="tag">고정비 감시</span>
+      </div>
+    </article>
+
+    <article class="persona">
+      <div class="avatar">민</div>
+      <div class="code">S06 · 영유아 맞벌이</div>
+      <h3>민호 · 34</h3>
+      <div class="meta">IT 과장 · 강남 · 6세 자녀 1명</div>
+      <p class="quote">맞벌이인데 왜 돈이 안 모이지?</p>
+      <p style="font-size: 12.5px; line-height: 1.6; color: var(--forest-soft); margin-bottom: 14px;">
+        원형 페르소나. 배우자 공유 기능이 장기 리텐션의 고리가 된다.
+      </p>
+      <div class="tags">
+        <span class="tag">가족 공유</span>
+        <span class="tag">주거 목표</span>
+        <span class="tag">교육 적립</span>
+      </div>
+    </article>
+
+    <article class="persona">
+      <div class="avatar">경</div>
+      <div class="code">S09 · 교육비 피크</div>
+      <h3>경숙 · 49</h3>
+      <div class="meta">파트타임 근무 · 고1·중2 남매</div>
+      <p class="quote">교육비는 줄일 수가 없어요.</p>
+      <p style="font-size: 12.5px; line-height: 1.6; color: var(--forest-soft); margin-bottom: 14px;">
+        "학원 줄이세요"라는 말이 없는 앱을 기다렸다. 균형 감각이 Aha의 핵심.
+      </p>
+      <div class="tags">
+        <span class="tag">균형 시뮬</span>
+        <span class="tag">노후 병행</span>
+        <span class="tag">판단 금지</span>
+      </div>
+    </article>
+
+    <article class="persona">
+      <div class="avatar">영</div>
+      <div class="code">S17 · 은퇴 생활기</div>
+      <h3>영호 · 67</h3>
+      <div class="meta">은퇴 엔지니어 · 국민연금 + 저축</div>
+      <p class="quote">이 속도로 쓰면 자산이 얼마나 버틸까?</p>
+      <p style="font-size: 12.5px; line-height: 1.6; color: var(--forest-soft); margin-bottom: 14px;">
+        한 번 적응하면 가장 충성도가 높다. 큰 글씨와 자산 잔존 시뮬이 생명선.
+      </p>
+      <div class="tags">
+        <span class="tag">은퇴 모드</span>
+        <span class="tag">자산 잔존</span>
+        <span class="tag">의료 대비</span>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- Emotion curve -->
+  <div class="emotion-chart reveal">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 18px;">
+      <div>
+        <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--terracotta);">Emotion Curves</div>
+        <h3 style="font-family: var(--serif-kr); font-weight: 700; font-size: 22px; margin-top: 4px;">페르소나별 감정 곡선</h3>
+      </div>
+      <div class="mono" style="font-size: 10px; color: var(--forest-soft); letter-spacing: 0.08em;">y: 감정 점수 · x: 사용 단계</div>
+    </div>
+
+    <svg viewBox="0 0 900 320" preserveAspectRatio="xMidYMid meet">
+      <!-- Grid -->
+      <g stroke="rgba(28,42,30,0.08)" stroke-width="1">
+        <line x1="60" y1="40"  x2="860" y2="40"/>
+        <line x1="60" y1="100" x2="860" y2="100"/>
+        <line x1="60" y1="160" x2="860" y2="160"/>
+        <line x1="60" y1="220" x2="860" y2="220"/>
+        <line x1="60" y1="280" x2="860" y2="280"/>
+      </g>
+      <!-- Y labels -->
+      <g font-family="JetBrains Mono, monospace" font-size="10" fill="#2E3F30">
+        <text x="40" y="44" text-anchor="end">10</text>
+        <text x="40" y="104" text-anchor="end">8</text>
+        <text x="40" y="164" text-anchor="end">6</text>
+        <text x="40" y="224" text-anchor="end">4</text>
+        <text x="40" y="284" text-anchor="end">2</text>
+      </g>
+      <!-- X labels -->
+      <g font-family="JetBrains Mono, monospace" font-size="10" fill="#2E3F30" text-anchor="middle">
+        <text x="100" y="310">P0</text>
+        <text x="230" y="310">P1</text>
+        <text x="360" y="310">P2</text>
+        <text x="490" y="310">P3 · Aha</text>
+        <text x="620" y="310">P4</text>
+        <text x="750" y="310">P4 말</text>
+        <text x="840" y="310">P5</text>
+      </g>
+
+      <!-- Persona curves -->
+      <!-- 지훈 (S01) - warm amber -->
+      <polyline fill="none" stroke="#E6B66A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        points="100,250 230,220 360,190 490,130 620,115 750,135 840,80" />
+      <!-- 수빈 (S04) - dusty rose -->
+      <polyline fill="none" stroke="#C6A68E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        points="100,280 230,240 360,190 490,100 620,125 750,160 840,115" />
+      <!-- 민호 (S06) - terracotta -->
+      <polyline fill="none" stroke="#C66A4A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+        points="100,235 230,195 360,160 490,80 620,140 750,185 840,70" />
+      <!-- 경숙 (S09) - mustard -->
+      <polyline fill="none" stroke="#B8934B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+        points="100,225 230,210 360,205 490,175 620,215 750,250 840,100" />
+      <!-- 영호 (S17) - forest -->
+      <polyline fill="none" stroke="#1C2A1E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"
+        points="100,280 230,260 360,210 490,155 620,140 750,125 840,50" />
+
+      <!-- Aha marker -->
+      <circle cx="490" cy="80" r="5" fill="#C66A4A" />
+      <text x="500" y="75" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="#C66A4A">Aha</text>
+    </svg>
+
+    <div class="emotion-legend">
+      <span class="lg"><span class="sw" style="background:#E6B66A"></span>지훈 · 사회초년생</span>
+      <span class="lg"><span class="sw" style="background:#C6A68E"></span>수빈 · 프리랜서</span>
+      <span class="lg"><span class="sw" style="background:#C66A4A"></span>민호 · 영유아 맞벌이</span>
+      <span class="lg"><span class="sw" style="background:#B8934B"></span>경숙 · 교육비 피크</span>
+      <span class="lg"><span class="sw" style="background:#1C2A1E"></span>영호 · 은퇴 생활기</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     §5 — ADAPTIVE HOME
+     ============================================================ -->
+<section id="adaptive" class="spread">
+  <div class="section-head reveal">
+    <div>
+      <div class="num">05</div>
+      <div class="lbl">Chapter · Adaptive Home</div>
+    </div>
+    <h2>같은 네 탭, <br>다섯 개의 첫 화면.</h2>
+    <div class="side">세그먼트별로 우선 위젯과 서사 헤더가 자동 재배치됩니다</div>
+  </div>
+
+  <div class="phones-deck reveal">
+
+    <!-- 지훈 S01 -->
+    <div class="phone-col">
+      <div class="label">S01 · 지훈</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>● ● ●</span></div>
+          <div class="top-bar">
+            <div class="brand-tiny">AssetCoach</div>
+            <div class="icons-row"><span>ⓤ</span><span>🔔</span></div>
+          </div>
+          <div class="scroll">
+            <div>
+              <h1>지훈님, 이번 달은 <em>지난달보다 살짝 덜 쓰셨어요.</em></h1>
+              <div class="sub">또래보다는 아직 조금 더 쓰시는 중이에요.</div>
+            </div>
+            <div class="widget terracotta">
+              <div class="w-label">또래 대비 저축률</div>
+              <div class="big-num">8<span class="sm">%</span></div>
+              <div class="gauge"><div class="fill" style="width: 42%;"></div></div>
+              <div class="row"><span style="opacity:.7;">또래 평균</span><span>19%</span></div>
+            </div>
+            <div class="card-insight">
+              <div class="ico">i</div>
+              <div class="txt">편의점·배달·카페 합계 <strong>월 42만원</strong> — 또래 평균의 2배예요.</div>
+            </div>
+            <div class="widget">
+              <div class="w-label">이번 달 목표</div>
+              <div class="row"><span>비상금 500만원</span><span style="font-family: var(--serif-en); font-style: italic; color: var(--terracotta);">72%</span></div>
+              <div class="gauge"><div class="fill" style="width: 72%;"></div></div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="t active"><span class="dot"></span>홈</div>
+            <div class="t"><span class="dot"></span>분석</div>
+            <div class="t"><span class="dot"></span>상담</div>
+            <div class="t"><span class="dot"></span>목표</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 수빈 S04 -->
+    <div class="phone-col">
+      <div class="label">S04 · 수빈</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>● ● ●</span></div>
+          <div class="top-bar">
+            <div class="brand-tiny">AssetCoach</div>
+            <div class="icons-row"><span>ⓤ</span><span>🔔</span></div>
+          </div>
+          <div class="scroll">
+            <div>
+              <h1>수빈님, <em>이번 달 입금이 아직</em> 도착하지 않았어요.</h1>
+              <div class="sub">고정비 내고 나면 지난달 여유분으로 23일 버텨요.</div>
+            </div>
+            <div class="widget accent">
+              <div class="w-label">고정비 대비 비상금</div>
+              <div class="big-num">2.5<span class="sm">개월</span></div>
+              <div class="caption">프리랜서 권장 6개월. 현재 2.5개월분.</div>
+              <div class="gauge"><div class="fill" style="width: 42%;"></div></div>
+            </div>
+            <div class="card-insight">
+              <div class="ico">%</div>
+              <div class="txt">6개월 수입 변동폭 <strong>±210만원</strong>. 같은 세그먼트 평균(±150만)보다 큰 편이에요.</div>
+            </div>
+            <div class="widget mustard">
+              <div class="w-label">분기 수입 리듬</div>
+              <div class="split-bar">
+                <div style="flex: 620; background: var(--forest);"></div>
+                <div style="flex: 210; background: var(--terracotta);"></div>
+                <div style="flex: 480; background: var(--forest);"></div>
+                <div style="flex: 360; background: var(--terracotta);"></div>
+              </div>
+              <div class="row" style="margin-top:6px; opacity:.75;"><span>1월</span><span>2월</span><span>3월</span><span>4월</span></div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="t active"><span class="dot"></span>홈</div>
+            <div class="t"><span class="dot"></span>분석</div>
+            <div class="t"><span class="dot"></span>상담</div>
+            <div class="t"><span class="dot"></span>목표</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 민호 S06 -->
+    <div class="phone-col">
+      <div class="label">S06 · 민호 (원형)</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>● ● ●</span></div>
+          <div class="top-bar">
+            <div class="brand-tiny">AssetCoach · 우리 가족</div>
+            <div class="icons-row"><span>👥</span><span>🔔</span></div>
+          </div>
+          <div class="scroll">
+            <div>
+              <h1>민호님 가족, <em>이번 달 이야기예요.</em></h1>
+              <div class="sub">중복 결제 2건 빼면 지난달보다 34만원 덜 쓰셨어요.</div>
+            </div>
+            <div class="widget accent">
+              <div class="w-label">우리 가족 재무 건강도</div>
+              <div class="big-num">72<span class="sm">/ 100</span></div>
+              <div class="caption">같은 맞벌이 영유아 가정 평균 <strong style="color:var(--mustard)">68점</strong> · 약간 높음</div>
+            </div>
+            <div class="card-insight">
+              <div class="ico">◇</div>
+              <div class="txt">중복 결제 2건 자동 제거: <strong>-34만원</strong>. 실제 식비는 43만원.</div>
+            </div>
+            <div class="widget">
+              <div class="w-label">이번 달 지출 구조</div>
+              <div class="split-bar">
+                <div style="flex: 28; background: var(--forest);"></div>
+                <div style="flex: 18; background: var(--terracotta);"></div>
+                <div style="flex: 15; background: var(--mustard);"></div>
+                <div style="flex: 19; background: #95A585;"></div>
+                <div style="flex: 20; background: var(--faint-2);"></div>
+              </div>
+              <div class="row" style="margin-top:6px; font-size:7.5px; opacity:.7; letter-spacing:0.04em;">
+                <span>주거</span><span>식비</span><span>자녀</span><span>저축</span><span>기타</span>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="t active"><span class="dot"></span>홈</div>
+            <div class="t"><span class="dot"></span>분석</div>
+            <div class="t"><span class="dot"></span>상담</div>
+            <div class="t"><span class="dot"></span>목표</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 경숙 S09 -->
+    <div class="phone-col">
+      <div class="label">S09 · 경숙</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>● ● ●</span></div>
+          <div class="top-bar">
+            <div class="brand-tiny">AssetCoach</div>
+            <div class="icons-row"><span>ⓤ</span><span>🔔</span></div>
+          </div>
+          <div class="scroll">
+            <div>
+              <h1>경숙님, <em>이번 달은 참 조용해요.</em></h1>
+              <div class="sub">교육비는 평소대로. 무리한 지출 없음.</div>
+            </div>
+            <div class="widget mustard">
+              <div class="w-label">교육 ↔ 노후 균형</div>
+              <div class="split-bar">
+                <div style="flex: 22; background: var(--terracotta);"></div>
+                <div style="flex: 8; background: var(--forest);"></div>
+                <div style="flex: 70; background: rgba(28,42,30,0.1);"></div>
+              </div>
+              <div class="row" style="margin-top:6px; font-size:8px;">
+                <span>교육 <strong>22%</strong></span>
+                <span>저축 <strong>8%</strong></span>
+              </div>
+              <div class="caption" style="color: var(--forest-soft); margin-top: 4px;">같은 세그먼트 평균: 교육 22% · 저축 15%</div>
+            </div>
+            <div class="card-insight">
+              <div class="ico">i</div>
+              <div class="txt">남편 학원 성수기 수입을 따로 떼어두면 <strong>월 42만원</strong>의 노후 여력이 나와요.</div>
+            </div>
+            <div class="widget">
+              <div class="w-label">이번 달 순 지출</div>
+              <div class="big-num">312<span class="sm">만원</span></div>
+              <div class="row"><span style="opacity:.7;">지난달</span><span>328만원</span></div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="t active"><span class="dot"></span>홈</div>
+            <div class="t"><span class="dot"></span>분석</div>
+            <div class="t"><span class="dot"></span>상담</div>
+            <div class="t"><span class="dot"></span>목표</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 영호 S17 — 은퇴 모드 -->
+    <div class="phone-col">
+      <div class="label">S17 · 영호 <span style="color: var(--mustard-deep)">· 은퇴 모드</span></div>
+      <div class="phone elder">
+        <div class="screen">
+          <div class="status"><span>9:41</span><span>● ● ●</span></div>
+          <div class="top-bar">
+            <div class="brand-tiny" style="font-size:12px;">AssetCoach</div>
+            <div class="icons-row" style="font-size:13px;"><span>ⓤ</span><span>🔔</span></div>
+          </div>
+          <div class="scroll">
+            <div>
+              <h1>영호님, <em>오늘도 반갑습니다.</em></h1>
+              <div class="sub">이번 달은 평소와 비슷한 흐름이에요.</div>
+            </div>
+            <div class="widget accent">
+              <div class="w-label">현 속도로 자산이 버티는 기간</div>
+              <div class="big-num" style="font-size: 38px;">32<span class="sm" style="font-size: 13px;">년</span></div>
+              <div class="caption">월 280만원 지출 · 국민연금 185만 · 자산 4억 2천</div>
+            </div>
+            <div class="card-insight">
+              <div class="ico">!</div>
+              <div class="txt">이번 달 <strong>병원비 58만원</strong>. 평소(35만)보다 많아요. 괜찮으세요?</div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="t active"><span class="dot"></span>홈</div>
+            <div class="t"><span class="dot"></span>분석</div>
+            <div class="t"><span class="dot"></span>상담</div>
+            <div class="t"><span class="dot"></span>목표</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="aside" style="margin-top: 40px; text-align: center;">
+    같은 정보 구조 안에서 <span style="color: var(--forest);">서사 헤더 · 우선 위젯 · 벤치마크 기준 · 어휘·크기</span>가 자동으로 변주됩니다.
+  </p>
+</section>
+
+<!-- ============================================================
+     §6 — CONVERSATION GALLERY
+     ============================================================ -->
+<section id="convos" class="spread" style="background: var(--cream-deep);">
+  <div class="section-head reveal">
+    <div>
+      <div class="num">06</div>
+      <div class="lbl">Chapter · Conversations</div>
+    </div>
+    <h2>일반론이 아니라, <br>당신의 날짜와 금액으로.</h2>
+    <div class="side">Gemma 4 E4B · 세그먼트별 시스템 프롬프트 주입</div>
+  </div>
+
+  <div class="convos reveal">
+
+    <!-- Convo 1 -->
+    <div class="convo">
+      <div class="head">
+        <div class="who">Gemma 4 · On-device</div>
+        <div class="seg-lbl">S01 · 지훈</div>
+      </div>
+      <div class="bubble-user">제 또래는 평균 얼마나 모아요?</div>
+      <div class="bubble-ai">
+        지훈님의 저축률은 <strong>8%</strong>예요. 같은 20대 후반 직장인 싱글 평균은 <em>19%</em>.
+        <br><br>
+        다만 한 가지 보셔야 할 게 있어요. 매달 '편의점 + 배달 + 카페' 합계가 <strong>월 42만원</strong>. 소득의 18%인데 같은 세그먼트 평균은 9%예요. 정확히 두 배 쓰세요.
+        <br><br>
+        어느 쪽부터 자세히 볼까요?
+        <div class="choice-row">
+          <span class="ch">편의점 자세히</span>
+          <span class="ch">배달 자세히</span>
+        </div>
+      </div>
+      <div class="convo-meta">
+        <span class="mt">포지셔닝 욕구</span>
+        <span class="mt">또래 비교</span>
+        <span class="mt">단일 행동 버튼</span>
+      </div>
+    </div>
+
+    <!-- Convo 2 -->
+    <div class="convo">
+      <div class="head">
+        <div class="who">Gemma 4 · On-device</div>
+        <div class="seg-lbl">S04 · 수빈</div>
+      </div>
+      <div class="bubble-user">세금 얼마 남겨둬야 해요?</div>
+      <div class="bubble-ai">
+        수빈님, 지난 6개월 수입 평균은 월 <strong>380만원</strong>, 변동폭 ±210만원이에요.
+        <br><br>
+        3.3% 원천징수분은 이미 떼었지만 종합소득세는 <em>별도 준비가 필요</em>해요. 작년 기준으로 계산하면 연 매출 대비 약 <strong>10%를 세금 버퍼</strong>로 따로 두시는 게 안전합니다.
+        <br><br>
+        월 평균 38만원. 이번 달 입금되면 자동으로 세금 계좌로 옮기는 알림 설정해드릴까요?
+        <div class="choice-row">
+          <span class="ch">알림 설정</span>
+          <span class="ch">다음에</span>
+        </div>
+      </div>
+      <div class="convo-meta">
+        <span class="mt">변동성 정상화</span>
+        <span class="mt">세금 버퍼</span>
+        <span class="mt">자동화 유도</span>
+      </div>
+    </div>
+
+    <!-- Convo 3 -->
+    <div class="convo">
+      <div class="head">
+        <div class="who">Gemma 4 · On-device</div>
+        <div class="seg-lbl">S06 · 민호</div>
+      </div>
+      <div class="bubble-user">이번 달 왜 많이 썼어?</div>
+      <div class="bubble-ai">
+        민호님, 이번 달 특이 지출은 세 가지예요.
+        <br><br>
+        <strong>1️⃣ 3월 12일 이마트 31만원</strong> — 평소 주간 장보기의 2.3배. 영수증 패턴 보니 프리미엄 식품 + 주방용품이 같이 잡혔어요. 혹시 손님 오셨어요?
+        <br><br>
+        <strong>2️⃣ 3월 18~22일 배민 7번, 23만원</strong> — 이 주에 야근 잦으셨나요?
+        <br><br>
+        <strong>3️⃣ 넷플릭스·왓챠·디즈니+·애플뮤직 4개 구독 = 월 5.5만원</strong>. 이 중에 최근 2주 안 보신 건 없으세요?
+        <br><br>
+        어느 이야기부터 볼까요?
+      </div>
+      <div class="convo-meta">
+        <span class="mt">구체 날짜·금액</span>
+        <span class="mt">공감형 질문</span>
+        <span class="mt">추궁 금지</span>
+      </div>
+    </div>
+
+    <!-- Convo 4 -->
+    <div class="convo">
+      <div class="head">
+        <div class="who">Gemma 4 · On-device</div>
+        <div class="seg-lbl">S09 · 경숙</div>
+      </div>
+      <div class="bubble-user">학원비가 너무 많이 나가요.</div>
+      <div class="bubble-ai">
+        경숙님, 두 가지 현실을 함께 보세요.
+        <br><br>
+        ① 교육비 월 <strong>212만원</strong> = 소득의 29%. 고등학생·중학생 있는 가정 평균은 22%. 약간 높지만 <em>학군·지역 고려하면 정상 범위</em>예요.
+        <br><br>
+        ② 은퇴 준비 가능 월 저축 <strong>18만원</strong>. 노후 본격기 평균은 60만원. 이 격차가 15년 후 3억 이상 차이로 벌어져요.
+        <br><br>
+        제가 제안 드릴 건 '교육비 줄이기'가 아니에요. 남편분 학원 수입 흐름을 분석해서, <em>성수기에 별도로 떼어둘 수 있는 돈</em>을 찾아드릴까요?
+        <div class="choice-row">
+          <span class="ch">성수기 분석</span>
+          <span class="ch">다음에</span>
+        </div>
+      </div>
+      <div class="convo-meta">
+        <span class="mt">판단 금지</span>
+        <span class="mt">균형 프레임</span>
+        <span class="mt">우회 솔루션</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     §7 — ARCHITECTURE (IA)
+     ============================================================ -->
+<section id="ia" class="spread dark">
+  <div class="section-head reveal">
+    <div>
+      <div class="num">07</div>
+      <div class="lbl">Chapter · Architecture</div>
+    </div>
+    <h2>네 개의 탭, <br>여섯 걸음의 온보딩.</h2>
+    <div class="side">구조는 공통 · 콘텐츠는 분기</div>
+  </div>
+
+  <div class="ia-wrap reveal">
+
+    <div class="tab-structure">
+      <h4>Global Navigation · 하단 4탭</h4>
+
+      <div class="tabs-viz">
+        <div class="ti">
+          <div class="icon">I</div>
+          <h5>홈</h5>
+          <p>세그먼트별<br>서사 헤더 + 우선 위젯</p>
+        </div>
+        <div class="ti">
+          <div class="icon">II</div>
+          <h5>분석</h5>
+          <p>지출 · 수입<br>자산 · 구독</p>
+        </div>
+        <div class="ti">
+          <div class="icon">III</div>
+          <h5>상담</h5>
+          <p>AI 대화 + <br>세그먼트별 추천 질문</p>
+        </div>
+        <div class="ti">
+          <div class="icon">IV</div>
+          <h5>목표</h5>
+          <p>다중 목표 · <br>진행률 · 시뮬</p>
+        </div>
+      </div>
+
+      <div class="tab-detail">
+        <div class="row">
+          <div class="l">I · 홈</div>
+          <div class="r">블록 1. 서사 헤더 / 블록 2. 세그먼트 우선 위젯 / 블록 3. 인사이트 카드 최대 3장 / 블록 4. 목표·액션</div>
+        </div>
+        <div class="row">
+          <div class="l">II · 분석</div>
+          <div class="r">지출·수입·자산·구독 4섹션. 기본 진입 섹션은 세그먼트별 자동 선택 (예: S17 영호 → 자산 잔존 시뮬)</div>
+        </div>
+        <div class="row">
+          <div class="l">III · 상담</div>
+          <div class="r">추천 질문 Top 5 + 자유 대화. 초기 사용자는 추천 70% · 성숙 사용자는 자유 60%</div>
+        </div>
+        <div class="row">
+          <div class="l">IV · 목표</div>
+          <div class="r">동시 진행 최대 5개. 세그먼트별 추천 목표 카드 제시</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="onboarding">
+      <h4>Onboarding Flow · 6단계</h4>
+
+      <div class="steps">
+        <div class="step">
+          <div class="n">i</div>
+          <div>
+            <h5>웰컴</h5>
+            <p>3장 캐러셀 · 따뜻한 첫인상 · AI 소개 · 프라이버시 선언</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">ii</div>
+          <div>
+            <h5>세그먼트 진단 · 4질문</h5>
+            <p>생년 · 수입 형태 · 가족 구성 · 자녀 연령. 자동으로 18개 중 1개 분류.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">iii</div>
+          <div>
+            <h5>성향 진단 · 선택</h5>
+            <p>소비 · 참여 · 위험의 3축. 건너뛰면 행동 데이터로 자동 추정.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">iv</div>
+          <div>
+            <h5>목표 선택 · 다중 선택 가능</h5>
+            <p>세그먼트 추천 목표 3개 강조. 직접 만들기도 가능.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">v</div>
+          <div>
+            <h5>데이터 연결</h5>
+            <p>SMS 파싱(안드로이드) · CSV 업로드 · 샘플로 둘러보기. 권한은 이 시점에 처음 요청.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">vi</div>
+          <div>
+            <h5>첫 투어 · 세그먼트 맞춤 3화면</h5>
+            <p>이 세그먼트에서 놓치면 안 되는 것만 강조.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     §8 — SAFETY
+     ============================================================ -->
+<section id="safety" class="spread">
+  <div class="section-head reveal">
+    <div>
+      <div class="num">08</div>
+      <div class="lbl">Chapter · Safety</div>
+    </div>
+    <h2>우리가 말하지 <br>않기로 한 것들.</h2>
+    <div class="side">법적·윤리적 경계 · 벤치마크·해석형까지만</div>
+  </div>
+
+  <div class="safety-grid reveal">
+
+    <div class="safety-col ok">
+      <h4><span class="tag">OK</span> 우리가 하는 말</h4>
+      <ul>
+        <li>"같은 세그먼트 평균은 저축률 19%예요. 지훈님은 9%로 약 10%p 낮네요."</li>
+        <li>"교육비가 소득의 22%를 넘으면 대부분 노후 준비가 어려워져요."</li>
+        <li>"은퇴 생활기 평균 의료비 비상금은 3천만원 수준이에요."</li>
+        <li>"연금저축 한도 400만원 중 120만원 쓰셨어요."</li>
+        <li>"이 속도로 쓰시면 자산은 32년 뒤에도 원금이 남아요."</li>
+      </ul>
+    </div>
+
+    <div class="safety-col no">
+      <h4><span class="tag">NO</span> 우리가 하지 않는 말</h4>
+      <ul>
+        <li>"10%p 더 저축하려면 S&P500 ETF에 월 X만원을…"</li>
+        <li>"학원을 2개 줄이세요."</li>
+        <li>"여성이니까 / 남성이니까…" (성별 기반 조언 전면 배제)</li>
+        <li>"이 상품에 가입하세요." (특정 상품 추천 금지)</li>
+        <li>"둘째는 언제 가지시는 게…" (가족 계획 개입 금지)</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <p class="aside" style="margin-top: 32px; text-align: center; max-width: 640px; margin-left: auto; margin-right: auto;">
+    — 앱 곳곳에 <span style="color: var(--forest);">"AssetCoach는 투자자문업자가 아니며, 제공 정보는 일반 참고용입니다"</span> 디스클레이머를 명시합니다.
+  </p>
+</section>
+
+<!-- ============================================================
+     COLOPHON
+     ============================================================ -->
+<footer class="colophon">
+
+  <div class="big">
+    "함께 <em>자산을</em> 키워가요"<br>
+    — 곁에 있는 <em>어른</em>이 되는 앱.
+  </div>
+
+  <div class="colophon-grid">
+    <div class="col-block">
+      <h5>Documents</h5>
+      <ul>
+        <li>handoff_v2.md</li>
+        <li>segment_matrix.md</li>
+        <li>user_journey_v2.md</li>
+        <li>information_architecture.md</li>
+      </ul>
+    </div>
+    <div class="col-block">
+      <h5>Status</h5>
+      <p>
+        1 기획 · 완료<br>
+        2 여정 맵 · 완료<br>
+        2.5 세그먼트 · 완료<br>
+        3 정보 구조 · 완료<br>
+        4 디자인 시스템 · 진행 예정<br>
+        5 와이어프레임 · 예정<br>
+        6 아키텍처 · 예정
+      </p>
+    </div>
+    <div class="col-block">
+      <h5>Tech Stack</h5>
+      <p>
+        Gemma 4 E4B<br>
+        온디바이스 추론<br>
+        iOS · Android 네이티브<br>
+        로컬 전용 저장소
+      </p>
+    </div>
+    <div class="col-block">
+      <h5>Colophon</h5>
+      <p>
+        Gowun Batang · Pretendard<br>
+        Fraunces · JetBrains Mono<br>
+        크림 · 딥 포레스트<br>
+        테라코타 · 머스타드
+      </p>
+    </div>
+  </div>
+
+  <div class="colophon-foot">
+    <span>© 2026 AssetCoach · Design Document Vol. 01</span>
+    <span>Seoul · Spring Edition</span>
+    <span>on-device intelligence, on-paper grace</span>
+  </div>
+
+</footer>
+
+<!-- ============================================================
+     Reveal-on-scroll (tiny)
+     ============================================================ -->
+<script>
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# Editor / IDE
+.idea/
+*.iml
+.vscode/
+
+# Android build outputs
+android/build/
+android/app/build/
+android/.gradle/
+android/.kotlin/
+android/captures/
+android/.cxx/
+android/local.properties
+android/app/release/
+android/.idea/
+*.apk
+*.ap_
+*.aab
+*.keystore
+
+# OS
+Icon

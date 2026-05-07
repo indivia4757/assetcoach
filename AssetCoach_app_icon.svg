@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>AssetCoach App Icon</title>
+
+  <!-- Cream squircle background -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FAF6EE"/>
+      <stop offset="1" stop-color="#EFE7D2"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.32" cy="0.28" r="0.9">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="224" ry="224" fill="url(#bgGrad)"/>
+  <rect width="1024" height="1024" rx="224" ry="224" fill="url(#glow)"/>
+
+  <!-- Editorial rule under the mark (mustard) -->
+  <rect x="232" y="870" width="560" height="6" fill="#D4AF6A"/>
+
+  <!-- Serif 'A' — Deep Forest, high-contrast flare -->
+  <!-- Left leg -->
+  <polygon points="494,200 512,264 308,820 160,820" fill="#1C2A1E"/>
+  <!-- Right leg -->
+  <polygon points="530,200 864,820 716,820 512,264" fill="#1C2A1E"/>
+  <!-- Apex cap -->
+  <polygon points="494,200 530,200 512,264" fill="#1C2A1E"/>
+
+  <!-- Crossbar — Terracotta, fitted between inner edges -->
+  <polygon points="394,580 630,580 642,614 382,614" fill="#C66A4A"/>
+
+  <!-- Brand mark dot (terracotta period) -->
+  <circle cx="822" cy="812" r="14" fill="#C66A4A"/>
+</svg>

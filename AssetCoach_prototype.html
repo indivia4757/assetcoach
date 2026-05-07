@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AssetCoach — Interactive Prototype</title>
+<link rel="icon" type="image/svg+xml" href="AssetCoach_app_icon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Fraunces:opsz,wght@9..144,300..900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+
+<style>
+/* ============================================================
+   AssetCoach Interactive Prototype (5단계)
+   디자인 시스템 토큰을 실제 적용한 모바일 mock
+   ============================================================ */
+
+:root {
+  /* Color */
+  --cream: #F7F3EC;
+  --cream-deep: #EFE8DA;
+  --paper: #FAF6EE;
+  --forest: #1C2A1E;
+  --forest-soft: #2E3F30;
+  --terracotta: #C66A4A;
+  --terracotta-deep: #A85536;
+  --mustard: #D4AF6A;
+  --mustard-deep: #B8934B;
+  --ink: #14201B;
+  --highlight: #F0E5CE;
+  --faint: rgba(28, 42, 30, 0.12);
+  --faint-2: rgba(28, 42, 30, 0.24);
+  --faint-3: rgba(28, 42, 30, 0.06);
+
+  /* Semantic */
+  --positive: #5C7A4F;
+  --positive-bg: #E8EFE0;
+  --negative: #A8543E;
+  --negative-bg: #F4E1D8;
+  --neutral: #8B8478;
+
+  /* Type */
+  --serif-kr: "Gowun Batang", serif;
+  --sans-kr: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --serif-en: "Fraunces", serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Spacing */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+
+  /* Radius */
+  --r-1: 4px; --r-2: 8px; --r-3: 12px; --r-4: 16px;
+  --r-5: 24px; --r-pill: 999px;
+
+  /* Motion */
+  --ease-out-paper: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --d-quick: 120ms;
+  --d-base: 240ms;
+  --d-slow: 360ms;
+  --d-narrative: 600ms;
+  --d-gauge: 900ms;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: linear-gradient(180deg, #2a3128 0%, #1a1f1b 100%);
+  color: var(--cream);
+  font-family: var(--sans-kr);
+  min-height: 100vh;
+  padding: 40px 24px 80px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================================
+   STAGE / Header
+   ============================================================ */
+.stage-header {
+  max-width: 1240px;
+  margin: 0 auto 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.stage-header .kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mustard);
+  opacity: 0.85;
+  margin-bottom: 12px;
+}
+
+.stage-header h1 {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.stage-header h1 em {
+  font-style: italic;
+  color: var(--mustard);
+}
+
+.stage-header p {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.75;
+  max-width: 560px;
+}
+
+/* Flow selector */
+.flow-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+.flow-btn {
+  background: rgba(247, 243, 236, 0.06);
+  border: 1px solid rgba(247, 243, 236, 0.18);
+  color: var(--cream);
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+  font-family: var(--sans-kr);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--d-base) var(--ease-out-paper);
+  letter-spacing: -0.005em;
+}
+
+.flow-btn .num {
+  font-family: var(--mono);
+  font-size: 10px;
+  opacity: 0.7;
+  margin-right: 8px;
+  letter-spacing: 0.1em;
+}
+
+.flow-btn:hover {
+  background: rgba(247, 243, 236, 0.12);
+  border-color: rgba(247, 243, 236, 0.32);
+}
+
+.flow-btn.active {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  color: var(--cream);
+}
+
+.flow-btn.active .num { opacity: 1; }
+
+/* Segment toggle (only visible for F2) */
+.segment-bar {
+  display: none;
+  gap: 6px;
+  margin-top: 14px;
+  align-items: center;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.segment-bar.visible { display: flex; }
+
+.segment-bar .label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  opacity: 0.6;
+  margin-right: 8px;
+}
+
+.seg-btn {
+  background: transparent;
+  border: 1px solid rgba(247, 243, 236, 0.2);
+  color: var(--cream);
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  font-family: var(--sans-kr);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--d-base);
+}
+
+.seg-btn:hover { border-color: rgba(247, 243, 236, 0.5); }
+
+.seg-btn.active {
+  background: var(--mustard);
+  color: var(--forest);
+  border-color: var(--mustard);
+  font-weight: 600;
+}
+
+/* ============================================================
+   STAGE / Layout
+   ============================================================ */
+.stage {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 32px;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 1100px) {
+  .stage {
+    grid-template-columns: 1fr;
+  }
+  .stage-side { display: none; }
+}
+
+.stage-side {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.7;
+  opacity: 0.55;
+  letter-spacing: 0.02em;
+}
+
+.stage-side h4 {
+  font-family: var(--serif-en);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0;
+  margin-bottom: 12px;
+  opacity: 1;
+  color: var(--mustard);
+}
+
+.stage-side .item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(247, 243, 236, 0.08);
+}
+
+.stage-side .item:last-child { border: 0; }
+
+.stage-side.right { text-align: right; }
+
+/* ============================================================
+   PHONE FRAME
+   ============================================================ */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--cream);
+  border-radius: 48px;
+  position: relative;
+  margin: 0 auto;
+  box-shadow:
+    0 0 0 12px #2a2e2c,
+    0 0 0 13px #1a1d1b,
+    0 30px 60px rgba(0, 0, 0, 0.5),
+    0 60px 120px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  font-family: var(--sans-kr);
+  color: var(--forest);
+}
+
+/* Notch */
+.phone::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 32px;
+  background: #1a1d1b;
+  border-radius: 18px;
+  z-index: 100;
+}
+
+/* Paper texture overlay (inside phone) */
+.phone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.16 0 0 0 0 0.12 0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+  z-index: 99;
+  border-radius: 48px;
+}
+
+.phone-screen {
+  position: absolute;
+  inset: 0;
+  border-radius: 48px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   STATUS BAR
+   ============================================================ */
+.status-bar {
+  height: 54px;
+  padding: 18px 32px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--sans-kr);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--forest);
+  flex-shrink: 0;
+}
+
+.status-bar .icons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.status-bar .icons span {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   APP HEADER (under status bar)
+   ============================================================ */
+.app-header {
+  height: 56px;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.app-header .title {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.app-header .icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--cream-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  border: 0;
+  color: var(--forest);
+}
+
+/* ============================================================
+   SCREEN BODY (scrollable)
+   ============================================================ */
+.screen-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 24px 16px;
+}
+
+.screen-body::-webkit-scrollbar { width: 0; }
+
+/* ============================================================
+   TAB BAR
+   ============================================================ */
+.tab-bar {
+  height: 76px;
+  padding: 8px 0 28px;
+  background: var(--cream);
+  border-top: 1px solid var(--faint);
+  display: flex;
+  justify-content: space-around;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
+
+.tab-btn {
+  background: 0;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--sans-kr);
+  font-size: 10px;
+  color: var(--neutral);
+  cursor: pointer;
+  padding: 6px 18px 4px;
+  position: relative;
+  transition: color var(--d-quick);
+}
+
+.tab-btn .icon {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.tab-btn.active {
+  color: var(--forest);
+  font-weight: 600;
+}
+
+.tab-btn.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2px;
+  background: var(--terracotta);
+  border-radius: 2px;
+}
+
+/* ============================================================
+   COMMON COMPONENTS
+   ============================================================ */
+.eyebrow {
+  font-family: var(--sans-kr);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mustard-deep);
+  margin-bottom: 6px;
+}
+
+.narrative {
+  font-family: var(--serif-kr);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  color: var(--forest);
+}
+
+.narrative em {
+  font-style: italic;
+  color: var(--terracotta-deep);
+  background: var(--highlight);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.card {
+  background: var(--paper);
+  border-radius: var(--r-3);
+  padding: 24px;
+  border: 1px solid var(--faint);
+  margin-bottom: 12px;
+  position: relative;
+  transition: transform var(--d-base) var(--ease-out-paper);
+}
+
+.card.widget {
+  border: 1px solid var(--mustard);
+  background: var(--paper);
+}
+
+.card .num-xl {
+  font-family: var(--sans-kr);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.card .num-lg {
+  font-family: var(--sans-kr);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.btn-primary {
+  background: var(--terracotta);
+  color: var(--cream);
+  border: 0;
+  border-radius: var(--r-3);
+  padding: 16px 24px;
+  font-family: var(--sans-kr);
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  transition: background var(--d-quick);
+  letter-spacing: -0.005em;
+}
+
+.btn-primary:hover { background: var(--terracotta-deep); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--forest);
+  border: 1.5px solid var(--forest);
+  border-radius: var(--r-3);
+  padding: 14px 24px;
+  font-family: var(--sans-kr);
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  letter-spacing: -0.005em;
+}
+
+.btn-tertiary {
+  background: 0;
+  border: 0;
+  color: var(--forest);
+  font-family: var(--sans-kr);
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Pill / chip */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--cream-deep);
+  color: var(--forest);
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-weight: 500;
+  border: 0;
+  cursor: pointer;
+  letter-spacing: -0.005em;
+}
+
+.chip.active {
+  background: var(--forest);
+  color: var(--cream);
+}
+
+/* Gauge bar (linear) */
+.gauge-linear {
+  height: 6px;
+  background: var(--faint);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  margin: 12px 0;
+}
+.gauge-linear .fill {
+  height: 100%;
+  background: var(--terracotta);
+  border-radius: 3px;
+  transition: width var(--d-gauge) var(--ease-out-paper);
+}
+.gauge-linear.green .fill { background: var(--positive); }
+.gauge-linear.mustard .fill { background: var(--mustard-deep); }
+
+/* Bar inline */
+.bar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--faint-3);
+}
+.bar-row:last-child { border: 0; }
+.bar-row .label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.bar-row .label .icon { font-size: 16px; }
+.bar-row .amount {
+  font-family: var(--mono);
+  font-weight: 600;
+  margin-right: 12px;
+  color: var(--forest);
+}
+.bar-row .bar {
+  width: 70px;
+  height: 5px;
+  background: var(--faint);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.bar-row .bar .fill {
+  height: 100%;
+  background: var(--forest-soft);
+}
+
+/* Donut chart (svg-based, mono-grayscale) */
+.donut-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 8px 0 16px;
+}
+.donut-center {
+  position: absolute;
+  text-align: center;
+}
+.donut-center .label {
+  font-family: var(--sans-kr);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--neutral);
+  margin-bottom: 4px;
+}
+.donut-center .value {
+  font-family: var(--sans-kr);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+/* Citation block (chat) */
+.citation {
+  border-left: 3px solid var(--terracotta);
+  padding: 10px 0 10px 14px;
+  margin: 10px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--forest-soft);
+  background: rgba(198, 106, 74, 0.05);
+  border-radius: 0 var(--r-2) var(--r-2) 0;
+}
+.citation .label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--terracotta-deep);
+  margin-bottom: 6px;
+}
+.citation .row {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+/* Mini bar chart inline */
+.mini-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 56px;
+  margin: 12px 0;
+}
+.mini-bars .bar {
+  flex: 1;
+  background: var(--forest-soft);
+  border-radius: 2px 2px 0 0;
+  position: relative;
+}
+.mini-bars .bar .lab {
+  position: absolute;
+  bottom: -18px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--neutral);
+}
+
+/* ============================================================
+   ONBOARDING
+   ============================================================ */
+.onboard-wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 24px 24px;
+}
+
+.progress-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 8px 0 32px;
+}
+.progress-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--faint);
+}
+.progress-dots span.active {
+  background: var(--forest);
+  width: 18px;
+  border-radius: 3px;
+}
+
+.welcome-display {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 32px 0 20px;
+}
+
+.welcome-sub {
+  font-family: var(--serif-kr);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--forest-soft);
+  letter-spacing: -0.005em;
+}
+
+.illustration {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 24px 0;
+}
+
+/* Q card (radio card) */
+.q-card {
+  background: var(--paper);
+  border: 1.5px solid var(--faint);
+  border-radius: var(--r-3);
+  padding: 18px 20px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all var(--d-base) var(--ease-out-paper);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.q-card:hover { border-color: var(--faint-2); }
+.q-card.selected {
+  border-color: var(--forest);
+  border-width: 1.5px;
+  background: var(--paper);
+}
+.q-card.selected::after {
+  content: "✓";
+  margin-left: auto;
+  color: var(--forest);
+  font-weight: 700;
+}
+.q-card .ico {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--cream-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.q-card .body {
+  flex: 1;
+}
+.q-card .body .title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--forest);
+  margin-bottom: 2px;
+  letter-spacing: -0.005em;
+}
+.q-card .body .desc {
+  font-size: 12px;
+  color: var(--forest-soft);
+  opacity: 0.7;
+}
+
+/* Top mini header (back + progress) */
+.mini-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--neutral);
+  letter-spacing: 0.05em;
+}
+.mini-top .back {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream-deep);
+  border-radius: 50%;
+  border: 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--forest);
+}
+.mini-top .progress {
+  flex: 1;
+  height: 3px;
+  background: var(--faint);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.mini-top .progress .fill {
+  height: 100%;
+  background: var(--forest);
+}
+
+/* ============================================================
+   HOME — segment-specific
+   ============================================================ */
+.home-block { margin-bottom: 20px; }
+.home-block.hero {
+  margin-top: 8px;
+}
+
+.home-narrative {
+  font-family: var(--serif-kr);
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1.4;
+  color: var(--forest);
+  letter-spacing: -0.005em;
+}
+
+/* Hero widget — reusable */
+.hero-widget {
+  background: var(--paper);
+  border-radius: var(--r-4);
+  padding: 22px 22px 24px;
+  border: 1px solid var(--mustard);
+  position: relative;
+  overflow: hidden;
+}
+
+/* gauge half-circle */
+.semi-gauge {
+  position: relative;
+  width: 200px;
+  height: 110px;
+  margin: 12px auto 4px;
+}
+.semi-gauge svg { width: 100%; height: 100%; display: block; }
+.semi-gauge .num {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-weight: 700;
+  font-size: 36px;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+/* Two-tone balance */
+.balance-bar {
+  display: flex;
+  margin-top: 14px;
+  height: 28px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  position: relative;
+  background: var(--cream-deep);
+}
+.balance-bar .left {
+  background: var(--forest-soft);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--cream); font-size: 11px; font-weight: 600;
+}
+.balance-bar .right {
+  background: var(--mustard-deep);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--cream); font-size: 11px; font-weight: 600;
+}
+
+/* Insight cards (horizontal scroll) */
+.insight-rail {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin: 0 -24px 0;
+  padding-left: 24px;
+  padding-right: 24px;
+  scroll-snap-type: x mandatory;
+}
+.insight-rail::-webkit-scrollbar { display: none; }
+
+.insight-card {
+  min-width: 220px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  background: var(--paper);
+  border-left: 4px solid var(--terracotta);
+  border-radius: var(--r-3);
+  padding: 16px 18px;
+  border-top: 1px solid var(--faint);
+  border-right: 1px solid var(--faint);
+  border-bottom: 1px solid var(--faint);
+}
+.insight-card.positive { border-left-color: var(--positive); }
+.insight-card.mustard { border-left-color: var(--mustard-deep); }
+
+.insight-card .eyebrow { margin-bottom: 4px; font-size: 10px; }
+.insight-card .head {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+.insight-card .body {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--forest-soft);
+}
+
+/* Goal item */
+.goal-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  gap: 12px;
+}
+.goal-item .ico {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--cream-deep);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.goal-item .info {
+  flex: 1;
+}
+.goal-item .info .title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.goal-item .info .meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--neutral);
+}
+.goal-item .pct {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--forest);
+}
+
+/* Coach quick action */
+.coach-cta {
+  background: var(--terracotta);
+  color: var(--cream);
+  border-radius: var(--r-3);
+  padding: 16px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin: 16px 0 4px;
+  border: 0;
+  width: 100%;
+  letter-spacing: -0.005em;
+  transition: background var(--d-quick);
+}
+.coach-cta:hover { background: var(--terracotta-deep); }
+.coach-cta .ico { font-size: 18px; }
+
+/* ============================================================
+   RETIREMENT MODE (S17)
+   ============================================================ */
+.phone[data-mode="retirement"] .home-narrative { font-size: 22px; }
+.phone[data-mode="retirement"] .narrative { font-size: 24px; }
+.phone[data-mode="retirement"] .insight-card .body { font-size: 14px; }
+.phone[data-mode="retirement"] .card { padding: 28px; }
+.phone[data-mode="retirement"] .btn-primary {
+  font-size: 17px; padding: 20px 24px;
+}
+.phone[data-mode="retirement"] .coach-cta {
+  font-size: 16px; padding: 20px 22px;
+}
+.phone[data-mode="retirement"] .goal-item .info .title { font-size: 15px; }
+.phone[data-mode="retirement"] .goal-item .info .meta { font-size: 12px; }
+
+/* ============================================================
+   CHAT
+   ============================================================ */
+.chat-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--cream);
+}
+
+.chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bubble {
+  max-width: 90%;
+  padding: 14px 16px;
+  border-radius: var(--r-5);
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+  animation: bubble-in 360ms var(--ease-out-paper);
+}
+@keyframes bubble-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bubble.user {
+  align-self: flex-end;
+  background: var(--forest);
+  color: var(--cream);
+  border-bottom-right-radius: 6px;
+  max-width: 80%;
+}
+.bubble.coach {
+  align-self: flex-start;
+  background: var(--paper);
+  border: 1px solid var(--faint);
+  color: var(--forest);
+  border-bottom-left-radius: 6px;
+}
+.bubble.coach strong {
+  font-weight: 700;
+  background: var(--highlight);
+  padding: 0 3px;
+  border-radius: 2px;
+}
+
+.bubble-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.coach-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--cream-deep);
+  border: 1.5px solid var(--terracotta);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--terracotta-deep);
+  flex-shrink: 0;
+}
+
+.suggested-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.suggested-chip {
+  background: var(--cream-deep);
+  border: 0;
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--sans-kr);
+  color: var(--forest);
+  letter-spacing: -0.005em;
+}
+.suggested-chip:hover { background: var(--highlight); }
+
+.chat-input {
+  background: var(--cream);
+  border-top: 1px solid var(--faint);
+  padding: 12px 18px 18px;
+  flex-shrink: 0;
+}
+.chat-input-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--paper);
+  border: 1px solid var(--faint);
+  border-radius: var(--r-pill);
+  padding: 10px 16px;
+}
+.chat-input input {
+  flex: 1;
+  border: 0;
+  background: 0;
+  font-family: var(--sans-kr);
+  font-size: 14px;
+  outline: none;
+  color: var(--forest);
+}
+.chat-input input::placeholder { color: var(--neutral); }
+.chat-input .send {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--terracotta);
+  color: var(--cream);
+  border: 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+.chat-input .send:hover { background: var(--terracotta-deep); }
+
+.typing {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  padding: 4px 0;
+}
+.typing span {
+  width: 5px; height: 5px;
+  background: var(--neutral);
+  border-radius: 50%;
+  animation: typing-dot 1.4s infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* ============================================================
+   ANALYSIS — subscription
+   ============================================================ */
+.tab-strip {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 18px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.tab-strip::-webkit-scrollbar { display: none; }
+.tab-strip-btn {
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 500;
+  background: 0;
+  border: 1px solid transparent;
+  color: var(--forest-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: -0.005em;
+  font-family: var(--sans-kr);
+}
+.tab-strip-btn.active {
+  background: var(--forest);
+  color: var(--cream);
+}
+
+.sub-card {
+  background: var(--paper);
+  border-radius: var(--r-3);
+  padding: 16px 18px;
+  border: 1px solid var(--faint);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sub-card.warn {
+  border-left: 4px solid var(--terracotta);
+}
+.sub-card .ico-lg {
+  width: 40px; height: 40px;
+  border-radius: var(--r-2);
+  background: var(--cream-deep);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.sub-card .info { flex: 1; }
+.sub-card .info .title {
+  font-size: 14px; font-weight: 600;
+  margin-bottom: 2px;
+}
+.sub-card .info .desc {
+  font-size: 11px;
+  color: var(--forest-soft);
+  opacity: 0.8;
+}
+.sub-card .price {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--forest);
+}
+.sub-card .action {
+  font-size: 11px;
+  color: var(--terracotta-deep);
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+.section-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 20px 0 10px;
+}
+.section-h .name {
+  font-family: var(--serif-kr);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+.section-h .meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--neutral);
+}
+
+/* ============================================================
+   CONTENT SWITCHER
+   ============================================================ */
+.flow-content {
+  display: none;
+}
+.flow-content.active {
+  display: contents;
+}
+
+.home-content {
+  display: none;
+}
+.home-content.active {
+  display: block;
+  animation: home-fade 360ms var(--ease-out-paper);
+}
+@keyframes home-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   FOOTER (caption under phone)
+   ============================================================ */
+.caption {
+  max-width: 600px;
+  margin: 28px auto 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(247, 243, 236, 0.45);
+  line-height: 1.8;
+}
+.caption .em {
+  color: var(--mustard);
+  font-style: italic;
+  font-family: var(--serif-en);
+  letter-spacing: 0;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="stage-header">
+  <div class="kicker">Stage 5 · Interactive Prototype</div>
+  <h1>네 가지 흐름,<br><em>같은 시스템</em>을 입은 한 사람의 앱.</h1>
+  <p>아래 버튼으로 핵심 흐름 4가지를 전환하면서, 디자인 시스템 토큰이 실제 화면에서 어떻게 작동하는지 확인합니다. 홈 흐름에서는 세그먼트 토글로 같은 4탭 구조가 전혀 다른 첫 화면으로 변주되는 모습을 볼 수 있습니다.</p>
+
+  <div class="flow-bar">
+    <button class="flow-btn" data-flow="onboarding"><span class="num">F1</span>온보딩</button>
+    <button class="flow-btn active" data-flow="home"><span class="num">F2</span>홈 변주</button>
+    <button class="flow-btn" data-flow="chat"><span class="num">F3</span>AI 상담</button>
+    <button class="flow-btn" data-flow="subscription"><span class="num">F4</span>인사이트→행동</button>
+  </div>
+
+  <div class="segment-bar visible" id="segmentBar">
+    <span class="label">Segment</span>
+    <button class="seg-btn active" data-seg="S06">S06 · 영유아 가구</button>
+    <button class="seg-btn" data-seg="S17">S17 · 은퇴 (자동 은퇴 모드)</button>
+    <button class="seg-btn" data-seg="S04">S04 · 프리랜서</button>
+  </div>
+</header>
+
+<!-- ============================================================
+     STAGE
+     ============================================================ -->
+<main class="stage">
+
+  <!-- LEFT side notes -->
+  <aside class="stage-side">
+    <h4>Design Tokens</h4>
+    <div class="item"><span>--cream</span><span>#F7F3EC</span></div>
+    <div class="item"><span>--forest</span><span>#1C2A1E</span></div>
+    <div class="item"><span>--terracotta</span><span>#C66A4A</span></div>
+    <div class="item"><span>--mustard</span><span>#D4AF6A</span></div>
+    <div class="item"><span>--paper</span><span>#FAF6EE</span></div>
+    <div style="margin-top: 24px;"></div>
+    <h4>Type Scale</h4>
+    <div class="item"><span>display</span><span>48 / 56</span></div>
+    <div class="item"><span>h1</span><span>32 / 40</span></div>
+    <div class="item"><span>narrative</span><span>20 / 26</span></div>
+    <div class="item"><span>body</span><span>15 / 20</span></div>
+    <div style="margin-top: 24px;"></div>
+    <h4>Motion</h4>
+    <div class="item"><span>quick</span><span>120ms</span></div>
+    <div class="item"><span>base</span><span>240ms</span></div>
+    <div class="item"><span>narrative</span><span>600ms</span></div>
+    <div class="item"><span>gauge</span><span>900ms</span></div>
+  </aside>
+
+  <!-- ============================================================
+       PHONE
+       ============================================================ -->
+  <div class="phone" id="phone" data-mode="normal">
+    <div class="phone-screen">
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="icons">
+          <span>●●●●</span>
+          <span>📶</span>
+          <span>🔋</span>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           FLOW 1 — ONBOARDING (Q2: 수입 형태)
+           ========================================================= -->
+      <div class="flow-content" data-flow="onboarding" style="flex: 1; display: none; flex-direction: column; padding: 0;">
+        <div class="onboard-wrap" data-phase="q2">
+          <div class="mini-top">
+            <button class="back">←</button>
+            <div class="progress"><div class="fill" style="width: 28%"></div></div>
+            <span>2 / 7</span>
+          </div>
+
+          <h2 style="font-family: var(--serif-kr); font-weight: 700; font-size: 28px; line-height: 1.2; letter-spacing: -0.015em; margin-bottom: 8px; color: var(--ink);">
+            수입은 어떻게<br>들어오나요?
+          </h2>
+          <p style="font-size: 13px; line-height: 1.6; color: var(--forest-soft); opacity: 0.75; margin-bottom: 24px;">
+            가장 가까운 형태 하나를 골라주세요. 나중에 바꿀 수 있어요.
+          </p>
+
+          <div style="flex: 1; overflow-y: auto; padding-bottom: 16px;">
+            <div class="q-card selected">
+              <div class="ico">💼</div>
+              <div class="body">
+                <div class="title">월급 안정형</div>
+                <div class="desc">매달 비슷한 금액 · 직장인·회사원</div>
+              </div>
+            </div>
+            <div class="q-card">
+              <div class="ico">🏛</div>
+              <div class="body">
+                <div class="title">월급 특수형</div>
+                <div class="desc">공무원·교사·군인</div>
+              </div>
+            </div>
+            <div class="q-card">
+              <div class="ico">🎨</div>
+              <div class="body">
+                <div class="title">변동 수입형</div>
+                <div class="desc">프리랜서·자영업·영업직</div>
+              </div>
+            </div>
+            <div class="q-card">
+              <div class="ico">⚕</div>
+              <div class="body">
+                <div class="title">고소득 전문직</div>
+                <div class="desc">의사·변호사·시니어 개발자</div>
+              </div>
+            </div>
+            <div class="q-card">
+              <div class="ico">📚</div>
+              <div class="body">
+                <div class="title">비정기 수입</div>
+                <div class="desc">학생·구직자·경력단절</div>
+              </div>
+            </div>
+            <div class="q-card">
+              <div class="ico">🌾</div>
+              <div class="body">
+                <div class="title">연금·자산 수입</div>
+                <div class="desc">은퇴자 · 자동으로 은퇴 모드</div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="onboardingNext('consent')">다음</button>
+          <div style="height: 8px;"></div>
+          <p style="text-align: center; font-size: 11px; color: var(--forest-soft); opacity: 0.6;">
+            🔒 이 정보는 기기를 떠나지 않아요
+          </p>
+        </div>
+
+        <!-- ===== Phase 2 — §1.7-A: Model Download Consent ===== -->
+        <div class="onboard-wrap" data-phase="consent" style="display: none;">
+          <div class="mini-top">
+            <button class="back" onclick="onboardingNext('q2')">←</button>
+            <div class="progress"><div class="fill" style="width: 86%"></div></div>
+            <span>6 / 7</span>
+          </div>
+
+          <h2 style="font-family: var(--serif-kr); font-weight: 700; font-size: 28px; line-height: 1.2; letter-spacing: -0.015em; margin-bottom: 8px; color: var(--ink);">
+            AI 코치를<br>준비할게요
+          </h2>
+          <p style="font-size: 13px; line-height: 1.6; color: var(--forest-soft); opacity: 0.8; margin-bottom: 20px;">
+            기기 안에서만 작동하는 대화형 코치를 받아옵니다. 한 번만 받고 나면 외부 통신 없이 작동해요.
+          </p>
+
+          <div style="background: var(--paper); border: 1px solid var(--mustard); border-radius: var(--r-3); padding: 4px 18px; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--faint-3);">
+              <div style="font-size: 22px;">📦</div>
+              <div style="flex: 1;">
+                <div style="font-size: 10px; color: var(--neutral); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2px;">필요한 공간</div>
+                <div style="font-family: var(--sans-kr); font-weight: 700; font-size: 22px; letter-spacing: -0.015em; color: var(--ink);">약 2.5 GB</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--faint-3);">
+              <div style="font-size: 22px;">📡</div>
+              <div style="flex: 1;">
+                <div style="font-size: 10px; color: var(--neutral); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2px;">예상 다운로드</div>
+                <div style="font-family: var(--sans-kr); font-weight: 600; font-size: 16px;">Wi-Fi · 5~10분</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0;">
+              <div style="font-size: 22px;">💾</div>
+              <div style="flex: 1;">
+                <div style="font-size: 10px; color: var(--neutral); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2px;">사용 가능 공간</div>
+                <div style="font-family: var(--sans-kr); font-weight: 600; font-size: 16px; color: var(--positive);">38.4 GB / 128 GB ✓</div>
+              </div>
+            </div>
+          </div>
+
+          <details style="background: var(--cream-deep); border-radius: var(--r-3); padding: 14px 18px; margin-bottom: 16px;">
+            <summary style="font-family: var(--serif-kr); font-weight: 700; font-size: 14px; color: var(--forest); cursor: pointer; list-style: none; outline: none;">왜 이렇게 클까요? &nbsp;⌄</summary>
+            <p style="font-size: 13px; line-height: 1.6; color: var(--forest-soft); margin-top: 10px;">
+              모든 분석을 외부 서버 없이 본인 기기에서 직접 하기 위한 AI 모델이에요. 한 번만 받고 나면 거래 데이터·대화 내용 모두 기기를 떠나지 않습니다.
+            </p>
+          </details>
+
+          <div style="flex: 1; min-height: 4px;"></div>
+
+          <button class="btn-primary" onclick="onboardingNext('progress')">Wi-Fi에서 다운로드</button>
+          <button class="btn-tertiary" style="width: 100%; padding: 12px 0 4px; font-size: 13px; color: var(--forest-soft);">모바일 데이터로 진행</button>
+          <button class="btn-tertiary" style="width: 100%; padding: 4px 0 8px; font-size: 13px; color: var(--forest-soft);">샘플로 먼저 둘러보기 ↓</button>
+        </div>
+
+        <!-- ===== Phase 3 — §1.7-B: Download Progress ===== -->
+        <div class="onboard-wrap" data-phase="progress" style="display: none;">
+          <div style="height: 32px;"></div>
+
+          <h2 style="font-family: var(--serif-kr); font-weight: 700; font-size: 28px; line-height: 1.2; letter-spacing: -0.015em; margin-bottom: 8px; color: var(--ink);">
+            AI 코치를<br>받아오는 중
+          </h2>
+          <p style="font-size: 13px; line-height: 1.6; color: var(--forest-soft); opacity: 0.7; margin-bottom: 32px;">
+            완료되면 첫 투어로 안내해 드릴게요.
+          </p>
+
+          <div style="background: var(--paper); border: 1px solid var(--mustard); border-radius: var(--r-3); padding: 32px 24px;">
+            <div style="text-align: center;">
+              <div style="font-family: var(--mono); font-size: 11px; color: var(--neutral); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px;">Progress</div>
+              <div style="font-family: var(--sans-kr); font-weight: 700; font-size: 32px; letter-spacing: -0.02em; color: var(--ink);">
+                <span id="modelProgressGB">0.0</span> <span style="opacity: 0.5; font-size: 18px; font-weight: 600;">/ 2.5 GB</span>
+              </div>
+            </div>
+            <div class="gauge-linear" style="margin: 20px 0 8px; height: 8px;">
+              <div class="fill" id="modelProgressFill" style="width: 0%; background: var(--terracotta); transition: width 1800ms cubic-bezier(0.2, 0.8, 0.2, 1);"></div>
+            </div>
+            <div style="text-align: center; font-family: var(--mono); font-size: 12px; color: var(--neutral); letter-spacing: 0.04em;">
+              <span id="modelProgressPct">0%</span> · 남은 시간 약 <span id="modelProgressEta">5분</span>
+            </div>
+          </div>
+
+          <p style="font-family: var(--serif-kr); font-size: 14px; line-height: 1.55; color: var(--forest-soft); text-align: center; margin: 24px 0 0;">
+            완료까지 백그라운드으로 진행돼요.<br>
+            다른 화면 보시거나 잠시 닫으셔도 돼요.
+          </p>
+
+          <div style="flex: 1; min-height: 4px;"></div>
+
+          <button class="btn-primary" onclick="onboardingNext('q2')">백그라운드 진행 → 첫 투어</button>
+          <button class="btn-tertiary" style="width: 100%; padding: 12px 0 8px; font-size: 13px; color: var(--forest-soft);">일시정지</button>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           FLOW 2 — HOME (with segment variants)
+           ========================================================= -->
+      <div class="flow-content active" data-flow="home" style="flex: 1; display: flex; flex-direction: column;">
+        <div class="app-header">
+          <button class="icon-btn">⌘</button>
+          <div class="title" id="homeTitle">에셋코치</div>
+          <button class="icon-btn">🔔</button>
+        </div>
+
+        <div class="screen-body">
+
+          <!-- ========== S06 민호 ========== -->
+          <div class="home-content active" data-seg="S06">
+            <div class="home-block hero">
+              <div class="eyebrow">민호님 가족</div>
+              <p class="home-narrative">
+                이번 달 이야기예요.<br>
+                중복 결제 두 건 빼면 지난달보다 <em style="font-style: italic; color: var(--terracotta-deep); background: var(--highlight); padding: 0 3px; border-radius: 2px;">34만원 덜</em> 쓰셨어요.
+              </p>
+            </div>
+
+            <div class="home-block">
+              <div class="hero-widget">
+                <div class="eyebrow">우리 가족 재무 건강도</div>
+                <div class="semi-gauge">
+                  <svg viewBox="0 0 200 110">
+                    <path d="M 20 100 A 80 80 0 0 1 180 100" stroke="rgba(28,42,30,0.12)" stroke-width="8" fill="none" stroke-linecap="round"/>
+                    <path d="M 20 100 A 80 80 0 0 1 180 100"
+                          stroke="#C66A4A" stroke-width="8" fill="none" stroke-linecap="round"
+                          stroke-dasharray="251.3"
+                          stroke-dashoffset="55"
+                          style="transition: stroke-dashoffset 900ms cubic-bezier(0.2, 0.8, 0.2, 1);"/>
+                  </svg>
+                  <div class="num">78<span style="font-size: 16px; opacity: 0.6; margin-left: 2px;">점</span></div>
+                </div>
+                <p style="font-family: var(--serif-kr); font-size: 14px; line-height: 1.5; text-align: center; color: var(--forest-soft); margin-top: 8px;">
+                  S06 평균 <strong style="color: var(--ink);">72점</strong>보다 6점 높아요
+                </p>
+                <button class="btn-tertiary" style="display: block; margin: 12px auto 0; font-size: 12px;">
+                  어떻게 해석하나요? →
+                </button>
+              </div>
+            </div>
+
+            <div class="home-block">
+              <div class="section-h">
+                <div class="name">이번 주 인사이트</div>
+                <div class="meta">3 / 7</div>
+              </div>
+              <div class="insight-rail">
+                <div class="insight-card">
+                  <div class="eyebrow">발견</div>
+                  <div class="head">중복 결제 2건<br>찾았어요</div>
+                  <div class="body">Netflix 가족·개인이 동시에 빠지고 있어요. 한 쪽 정리하면 월 17,000원 절약.</div>
+                </div>
+                <div class="insight-card positive">
+                  <div class="eyebrow">변화</div>
+                  <div class="head">사교육비 −5%</div>
+                  <div class="body">학원 한 곳 휴원으로 이번 달 사교육이 평소보다 적어요.</div>
+                </div>
+                <div class="insight-card mustard">
+                  <div class="eyebrow">평균</div>
+                  <div class="head">가족 외식<br>S06 평균 수준</div>
+                  <div class="body">28만원으로 같은 또래 가구와 거의 동일.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="home-block">
+              <div class="section-h">
+                <div class="name">진행 중인 목표</div>
+                <div class="meta">2개</div>
+              </div>
+              <div class="card" style="padding: 14px 18px;">
+                <div class="goal-item" style="padding: 6px 0;">
+                  <div class="ico">🛡</div>
+                  <div class="info">
+                    <div class="title">비상금 6개월치</div>
+                    <div class="meta">720만 / 1,000만</div>
+                    <div class="gauge-linear" style="margin: 6px 0 0;"><div class="fill" style="width: 72%"></div></div>
+                  </div>
+                  <div class="pct">72%</div>
+                </div>
+                <div style="border-top: 1px solid var(--faint-3); margin: 6px 0;"></div>
+                <div class="goal-item" style="padding: 6px 0;">
+                  <div class="ico">✈</div>
+                  <div class="info">
+                    <div class="title">가족 여행 자금</div>
+                    <div class="meta">45만 / 100만</div>
+                    <div class="gauge-linear mustard" style="margin: 6px 0 0;"><div class="fill" style="width: 45%"></div></div>
+                  </div>
+                  <div class="pct">45%</div>
+                </div>
+              </div>
+            </div>
+
+            <button class="coach-cta">
+              <span class="ico">💬</span>
+              <span>AI 코치에게 물어보기</span>
+              <span style="margin-left: auto;">→</span>
+            </button>
+          </div>
+
+          <!-- ========== S17 영호 (은퇴 모드) ========== -->
+          <div class="home-content" data-seg="S17">
+            <div class="home-block hero">
+              <div class="eyebrow">영호님</div>
+              <p class="home-narrative">
+                오늘도 반갑습니다.<br>
+                이번 달은 <em style="font-style: italic; color: var(--terracotta-deep); background: var(--highlight); padding: 0 3px;">평소와 비슷한</em> 흐름이에요.
+              </p>
+            </div>
+
+            <div class="home-block">
+              <div class="hero-widget">
+                <div class="eyebrow">현 속도로 자산 잔존</div>
+                <div style="text-align: center; margin: 18px 0 14px;">
+                  <div style="font-family: var(--sans-kr); font-weight: 700; font-size: 56px; line-height: 1; letter-spacing: -0.025em; color: var(--ink);">
+                    23<span style="font-size: 22px; opacity: 0.6; margin-left: 4px; font-weight: 600;">년</span>
+                  </div>
+                </div>
+                <div class="gauge-linear" style="height: 8px;">
+                  <div class="fill" style="width: 72%; background: var(--mustard-deep);"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--neutral); margin-top: 6px;">
+                  <span>현재 자산 3.2억</span>
+                  <span>월 평균 인출 230만</span>
+                </div>
+                <p style="font-family: var(--serif-kr); font-size: 16px; line-height: 1.5; text-align: center; margin-top: 16px; color: var(--forest);">
+                  S17 평균보다 <strong style="color: var(--positive);">4년 더</strong> 버텨요
+                </p>
+                <button class="btn-primary" style="margin-top: 14px;">인출 계획 보기</button>
+              </div>
+            </div>
+
+            <div class="home-block">
+              <div class="section-h">
+                <div class="name">이번 달 한 가지</div>
+              </div>
+              <div class="insight-card mustard" style="min-width: 0;">
+                <div class="eyebrow">평소 대비</div>
+                <div class="head" style="font-size: 22px;">의료비 18만원<br><span style="color: var(--terracotta-deep);">+6만원</span></div>
+                <div class="body" style="font-size: 14px;">평소 12만원 대비 늘었어요. 일회성인지 주기적인지 함께 보실래요?</div>
+              </div>
+            </div>
+
+            <button class="coach-cta">
+              <span class="ico">💬</span>
+              <span>코치에게 말하기</span>
+              <span style="margin-left: auto;">→</span>
+            </button>
+          </div>
+
+          <!-- ========== S04 수빈 (프리랜서) ========== -->
+          <div class="home-content" data-seg="S04">
+            <div class="home-block hero">
+              <div class="eyebrow">수빈님</div>
+              <p class="home-narrative">
+                이번 달 입금이 <em style="font-style: italic; color: var(--terracotta-deep); background: var(--highlight); padding: 0 3px;">아직 도착</em>하지 않았어요.<br>
+                고정비 내고 나면 지난달 여유분으로 <strong>23일</strong> 버텨요.
+              </p>
+            </div>
+
+            <div class="home-block">
+              <div class="hero-widget">
+                <div class="eyebrow">고정비 대비 비상금 개월수</div>
+                <div style="text-align: center; margin: 14px 0 8px;">
+                  <div style="font-family: var(--sans-kr); font-weight: 700; font-size: 48px; line-height: 1; letter-spacing: -0.02em; color: var(--ink);">
+                    2.3<span style="font-size: 20px; margin-left: 4px; opacity: 0.6;">개월</span>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 2px; height: 14px; margin: 14px 0 6px;">
+                  <div style="flex: 2.3; background: var(--terracotta); border-radius: 3px;"></div>
+                  <div style="flex: 3.7; background: var(--faint); border-radius: 3px;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--neutral);">
+                  <span>지금 2.3</span>
+                  <span>권장 6.0</span>
+                </div>
+                <p style="font-family: var(--serif-kr); font-size: 14px; line-height: 1.5; text-align: center; margin-top: 14px; color: var(--forest-soft);">
+                  변동 수입은 <strong style="color: var(--ink);">6개월치</strong> 비상금이 안전선이에요
+                </p>
+              </div>
+            </div>
+
+            <div class="home-block">
+              <div class="section-h">
+                <div class="name">변동 수입 시그널</div>
+                <div class="meta">최근 6개월</div>
+              </div>
+              <div class="insight-rail">
+                <div class="insight-card">
+                  <div class="eyebrow">편차</div>
+                  <div class="head">±42%</div>
+                  <div class="body">최저 220만, 최고 540만. 분기·연간 토글로 보면 흐름이 보여요.</div>
+                </div>
+                <div class="insight-card mustard">
+                  <div class="eyebrow">5월 대비</div>
+                  <div class="head">종소세<br>적립 부족 320만</div>
+                  <div class="body">5월 종합소득세 신고까지 한 달, 별도 적립 시뮬레이션 보기.</div>
+                </div>
+                <div class="insight-card">
+                  <div class="eyebrow">고정비 비중</div>
+                  <div class="head">64%</div>
+                  <div class="body">변동 수입에 비해 높아요. 줄일 만한 항목 함께 볼까요?</div>
+                </div>
+              </div>
+            </div>
+
+            <button class="coach-cta">
+              <span class="ico">💬</span>
+              <span>이번 달 어떻게 버틸지 보기</span>
+              <span style="margin-left: auto;">→</span>
+            </button>
+          </div>
+
+        </div>
+
+        <div class="tab-bar">
+          <button class="tab-btn active"><div class="icon">⌂</div>홈</button>
+          <button class="tab-btn"><div class="icon">▤</div>분석</button>
+          <button class="tab-btn"><div class="icon">◌</div>상담</button>
+          <button class="tab-btn"><div class="icon">◇</div>목표</button>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           FLOW 3 — CHAT
+           ========================================================= -->
+      <div class="flow-content" data-flow="chat" style="flex: 1; display: none; flex-direction: column;">
+        <div class="app-header" style="border-bottom: 1px solid var(--faint);">
+          <button class="icon-btn">←</button>
+          <div class="title">코치와의 대화</div>
+          <button class="icon-btn">ⓘ</button>
+        </div>
+
+        <div class="chat-body" id="chatBody">
+          <div class="bubble-row">
+            <div class="coach-avatar">A</div>
+            <div class="bubble coach">
+              안녕하세요, 민호님.<br>오늘은 무엇을 함께 볼까요?
+            </div>
+          </div>
+
+          <div class="bubble user">이번 달 왜 많이 썼어?</div>
+
+          <div class="bubble-row">
+            <div class="coach-avatar">A</div>
+            <div class="bubble coach">
+              이번 달은 사실,<br>
+              <strong>지난달보다 34만원 덜</strong> 쓰셨어요.
+
+              <div class="citation">
+                <div class="label">인용한 데이터</div>
+                <div class="row">4월 지출 · <strong>3,420,000원</strong></div>
+                <div class="row">3월 지출 · 3,760,000원</div>
+              </div>
+
+              다만 두 항목이 평소보다 컸어요:
+
+              <div class="mini-bars">
+                <div class="bar" style="height: 30%; background: var(--neutral);"><div class="lab">식비</div></div>
+                <div class="bar" style="height: 60%;"><div class="lab">외식</div></div>
+                <div class="bar" style="height: 90%; background: var(--terracotta);"><div class="lab">가전</div></div>
+              </div>
+
+              <div style="height: 12px;"></div>
+              일회성인지, 패턴인지 함께 볼까요?
+            </div>
+          </div>
+
+          <div class="bubble-row" style="margin-left: 36px;">
+            <div class="suggested-row">
+              <button class="suggested-chip">응, 외식부터</button>
+              <button class="suggested-chip">가전 먼저</button>
+              <button class="suggested-chip">그만 됐어</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <div class="chat-input-inner">
+            <input type="text" placeholder="메시지 입력..." id="chatInput" />
+            <button class="send" onclick="sendChat()">↑</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           FLOW 4 — ANALYSIS / Subscription
+           ========================================================= -->
+      <div class="flow-content" data-flow="subscription" style="flex: 1; display: none; flex-direction: column;">
+        <div class="app-header">
+          <button class="icon-btn">⌘</button>
+          <div class="title">분석</div>
+          <button class="icon-btn">🔔</button>
+        </div>
+
+        <div class="screen-body">
+          <div class="tab-strip">
+            <button class="tab-strip-btn">지출</button>
+            <button class="tab-strip-btn">수입</button>
+            <button class="tab-strip-btn">자산</button>
+            <button class="tab-strip-btn active">구독</button>
+            <button class="tab-strip-btn">예산</button>
+          </div>
+
+          <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;">
+            <div style="font-family: var(--serif-kr); font-weight: 700; font-size: 28px; letter-spacing: -0.015em;">활성 12건</div>
+            <div style="font-family: var(--mono); font-size: 13px; color: var(--neutral);">월 84,500원</div>
+          </div>
+          <p style="font-family: var(--serif-kr); font-size: 14px; line-height: 1.5; color: var(--forest-soft); margin-bottom: 20px;">
+            지난달 대비 변화 없음. 다만 <strong style="color: var(--terracotta-deep);">3건이 미사용</strong>으로 보여요.
+          </p>
+
+          <div class="section-h">
+            <div class="name" style="display: flex; align-items: center; gap: 6px;">
+              <span style="color: var(--terracotta-deep);">⚠</span> 미사용 의심
+            </div>
+            <div class="meta">3건</div>
+          </div>
+
+          <div class="sub-card warn">
+            <div class="ico-lg">🎵</div>
+            <div class="info">
+              <div class="title">멜론</div>
+              <div class="desc">3개월간 앱 실행 X</div>
+              <div class="action">해지하러 가기 →</div>
+            </div>
+            <div class="price">7,900</div>
+          </div>
+
+          <div class="sub-card warn">
+            <div class="ico-lg">📚</div>
+            <div class="info">
+              <div class="title">밀리의 서재</div>
+              <div class="desc">2개월간 미사용</div>
+              <div class="action">해지하러 가기 →</div>
+            </div>
+            <div class="price">9,900</div>
+          </div>
+
+          <div class="sub-card warn">
+            <div class="ico-lg">🏋</div>
+            <div class="info">
+              <div class="title">홈트 프리미엄</div>
+              <div class="desc">5개월 째 미접속</div>
+              <div class="action">해지하러 가기 →</div>
+            </div>
+            <div class="price">12,000</div>
+          </div>
+
+          <div class="section-h">
+            <div class="name">중복 의심</div>
+            <div class="meta">1쌍</div>
+          </div>
+
+          <div class="sub-card">
+            <div class="ico-lg">🎬</div>
+            <div class="info">
+              <div class="title">Netflix 가족 + 개인</div>
+              <div class="desc">동시에 빠지는 결제 발견</div>
+              <div class="action">한 쪽 정리하러 →</div>
+            </div>
+            <div class="price">17,000<br><span style="font-size: 10px; opacity: 0.6;">+ 13,500</span></div>
+          </div>
+
+          <div class="section-h">
+            <div class="name">전체 활성</div>
+            <div class="meta">12건</div>
+          </div>
+
+          <div class="sub-card">
+            <div class="ico-lg">🎬</div>
+            <div class="info">
+              <div class="title">Netflix 가족</div>
+              <div class="desc">매월 12일</div>
+            </div>
+            <div class="price">17,000</div>
+          </div>
+
+          <div class="sub-card">
+            <div class="ico-lg">🎵</div>
+            <div class="info">
+              <div class="title">Spotify Premium</div>
+              <div class="desc">매월 5일</div>
+            </div>
+            <div class="price">11,900</div>
+          </div>
+
+          <div class="sub-card">
+            <div class="ico-lg">⚙</div>
+            <div class="info">
+              <div class="title">ChatGPT Plus</div>
+              <div class="desc">매월 22일</div>
+            </div>
+            <div class="price">22,000</div>
+          </div>
+
+          <div style="height: 16px;"></div>
+        </div>
+
+        <div class="tab-bar">
+          <button class="tab-btn"><div class="icon">⌂</div>홈</button>
+          <button class="tab-btn active"><div class="icon">▤</div>분석</button>
+          <button class="tab-btn"><div class="icon">◌</div>상담</button>
+          <button class="tab-btn"><div class="icon">◇</div>목표</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT side notes -->
+  <aside class="stage-side right">
+    <h4>Active Flow</h4>
+    <div class="item"><span></span><span id="activeFlowName">F2 · Home Variants</span></div>
+    <div class="item"><span></span><span id="activeSeg">S06 · 영유아 가구</span></div>
+    <div class="item"><span></span><span id="activeMode">Normal Mode</span></div>
+    <div style="margin-top: 24px;"></div>
+    <h4>Components Used</h4>
+    <div class="item" id="comp1"><span></span><span>Hero Widget</span></div>
+    <div class="item"><span></span><span>Insight Rail</span></div>
+    <div class="item"><span></span><span>Goal Card</span></div>
+    <div class="item"><span></span><span>Coach CTA</span></div>
+    <div class="item"><span></span><span>Tab Bar</span></div>
+    <div style="margin-top: 24px;"></div>
+    <h4>Reference</h4>
+    <div class="item"><span></span><span>IA · §Home</span></div>
+    <div class="item"><span></span><span>DS · §Components</span></div>
+    <div class="item"><span></span><span>Wireframes · §2</span></div>
+  </aside>
+
+</main>
+
+<!-- ============================================================
+     CAPTION
+     ============================================================ -->
+<p class="caption">
+  <span class="em">"Same four tabs, five first impressions."</span><br>
+  Stage 5 prototype · Built on AssetCoach Design System v1.0 · 2026-04-30
+</p>
+
+<script>
+// ============================================================
+// Flow switching
+// ============================================================
+const flowBtns = document.querySelectorAll('.flow-btn');
+const flowContents = document.querySelectorAll('.flow-content');
+const segBar = document.getElementById('segmentBar');
+const activeFlowName = document.getElementById('activeFlowName');
+
+const flowLabels = {
+  onboarding: 'F1 · Onboarding',
+  home: 'F2 · Home Variants',
+  chat: 'F3 · AI Coach',
+  subscription: 'F4 · Subscription'
+};
+
+flowBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const flow = btn.dataset.flow;
+    flowBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    flowContents.forEach(fc => {
+      const isActive = fc.dataset.flow === flow;
+      fc.style.display = isActive ? 'flex' : 'none';
+      fc.classList.toggle('active', isActive);
+    });
+
+    if (flow === 'home') {
+      segBar.classList.add('visible');
+    } else {
+      segBar.classList.remove('visible');
+    }
+
+    if (flow === 'onboarding') {
+      onboardingNext('q2');
+    }
+
+    activeFlowName.textContent = flowLabels[flow];
+  });
+});
+
+// ============================================================
+// Onboarding phase switching (Q2 → Consent → Progress)
+// ============================================================
+function onboardingNext(phase) {
+  document.querySelectorAll('.flow-content[data-flow="onboarding"] .onboard-wrap').forEach(w => {
+    const isActive = w.dataset.phase === phase;
+    w.style.display = isActive ? 'flex' : 'none';
+  });
+
+  if (phase === 'progress') {
+    // Animate gauge from 0 → 56% over 1.8s
+    const fill = document.getElementById('modelProgressFill');
+    const pct = document.getElementById('modelProgressPct');
+    const gb = document.getElementById('modelProgressGB');
+    const eta = document.getElementById('modelProgressEta');
+    if (fill) {
+      fill.style.width = '0%';
+      pct.textContent = '0%';
+      gb.textContent = '0.0';
+      eta.textContent = '5분';
+      setTimeout(() => {
+        fill.style.width = '56%';
+        // Tween numbers in sync
+        let start = performance.now();
+        function step(ts) {
+          const t = Math.min((ts - start) / 1800, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          const p = Math.round(56 * eased);
+          pct.textContent = p + '%';
+          gb.textContent = (2.5 * eased * 56 / 100).toFixed(1);
+          if (t < 1) requestAnimationFrame(step);
+          else eta.textContent = '3분';
+        }
+        requestAnimationFrame(step);
+      }, 100);
+    }
+  } else {
+    // Reset progress visuals when leaving
+    const fill = document.getElementById('modelProgressFill');
+    if (fill) fill.style.width = '0%';
+  }
+}
+
+// ============================================================
+// Segment switching (S06 / S17 / S04)
+// ============================================================
+const segBtns = document.querySelectorAll('.seg-btn');
+const homeContents = document.querySelectorAll('.home-content');
+const phone = document.getElementById('phone');
+const activeSeg = document.getElementById('activeSeg');
+const activeMode = document.getElementById('activeMode');
+
+const segLabels = {
+  S06: 'S06 · 영유아 가구',
+  S17: 'S17 · 은퇴 (은퇴 모드)',
+  S04: 'S04 · 프리랜서'
+};
+
+segBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const seg = btn.dataset.seg;
+    segBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    homeContents.forEach(hc => {
+      hc.classList.toggle('active', hc.dataset.seg === seg);
+    });
+
+    if (seg === 'S17') {
+      phone.dataset.mode = 'retirement';
+      activeMode.textContent = 'Retirement Mode';
+    } else {
+      phone.dataset.mode = 'normal';
+      activeMode.textContent = 'Normal Mode';
+    }
+
+    activeSeg.textContent = segLabels[seg];
+  });
+});
+
+// ============================================================
+// Onboarding card selection
+// ============================================================
+document.querySelectorAll('.q-card').forEach(card => {
+  card.addEventListener('click', () => {
+    card.parentElement.querySelectorAll('.q-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  });
+});
+
+// ============================================================
+// Tab strip (analysis)
+// ============================================================
+document.querySelectorAll('.tab-strip-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.parentElement.querySelectorAll('.tab-strip-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ============================================================
+// Suggested chips (chat replies)
+// ============================================================
+document.querySelectorAll('.suggested-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    addUserBubble(chip.textContent);
+    setTimeout(() => addCoachReply(chip.textContent), 800);
+  });
+});
+
+// ============================================================
+// Chat send
+// ============================================================
+const chatInput = document.getElementById('chatInput');
+const chatBody = document.getElementById('chatBody');
+
+function sendChat() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+  addUserBubble(text);
+  chatInput.value = '';
+  setTimeout(() => addCoachReply(text), 700);
+}
+
+chatInput?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendChat();
+});
+
+function addUserBubble(text) {
+  const div = document.createElement('div');
+  div.className = 'bubble user';
+  div.textContent = text;
+  chatBody.appendChild(div);
+  scrollChat();
+}
+
+function addCoachReply(prompt) {
+  const row = document.createElement('div');
+  row.className = 'bubble-row';
+  row.innerHTML = `
+    <div class="coach-avatar">A</div>
+    <div class="bubble coach">
+      <div class="typing"><span></span><span></span><span></span></div>
+    </div>
+  `;
+  chatBody.appendChild(row);
+  scrollChat();
+
+  setTimeout(() => {
+    const reply = pickReply(prompt);
+    row.querySelector('.bubble').innerHTML = reply;
+    scrollChat();
+  }, 1100);
+}
+
+function pickReply(prompt) {
+  const p = prompt.toLowerCase();
+  if (p.includes('외식')) {
+    return `외식부터 같이 볼게요.<br><br>
+      <strong>4월 외식 142,000원</strong> — 평소 95,000원 대비 +49%.
+      <div class="citation">
+        <div class="label">발생 일자</div>
+        <div class="row">4/12 · 패밀리 레스토랑 68,000</div>
+        <div class="row">4/19 · 호텔 부페 54,000</div>
+      </div>
+      두 번 모두 주말 가족 모임이에요. 일상 외식은 평균이고, 이벤트 두 번이 컸네요.`;
+  }
+  if (p.includes('가전')) {
+    return `가전은 명확해요.<br><br>
+      4/8 · <strong>건조기 1,290,000원</strong> 한 건이 전부예요.
+      이건 일회성이라 보고 다음 달부터는 평소 흐름으로 돌아갈 거예요.`;
+  }
+  if (p.includes('그만')) {
+    return `네, 알겠습니다.<br>필요할 때 다시 부르세요.`;
+  }
+  return `좋아요, 함께 살펴볼게요.<br><br>
+    구체적으로 어느 부분이 궁금하세요? "이번 달 식비", "사교육비 추이", "비상금 진행" 같은 식으로 물어보시면 정확한 숫자로 답해드려요.`;
+}
+
+function scrollChat() {
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// ============================================================
+// Tab bar (within phone, just visual feedback)
+// ============================================================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>

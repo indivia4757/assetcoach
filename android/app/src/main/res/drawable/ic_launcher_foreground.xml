@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Simple 'A' wordmark in deep forest as Phase 1 placeholder.
+         Replace with AssetCoach_app_icon.svg conversion in Phase 1.5
+         (Android Studio → New → Vector Asset). -->
+    <path
+        android:fillColor="#1C2A1E"
+        android:pathData="M54,30 L41,78 L48,78 L51.2,66 L56.8,66 L60,78 L67,78 L54,30 Z M52.6,60 L54,52 L55.4,60 Z" />
+
+    <!-- Terracotta dot accent -->
+    <path
+        android:fillColor="#C66A4A"
+        android:pathData="M54,84 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+</vector>
