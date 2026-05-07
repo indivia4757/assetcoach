@@ -2,12 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Phase 4 — SMS Notification Listener (uncomment when implementing parser) -->
-    <!--
-    <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
-        tools:ignore="ProtectedPermissions" />
+    <!-- Phase 4 — SMS Notification Listener -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    -->
 
     <application
         android:name=".AssetCoachApp"
@@ -30,6 +26,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Phase 4: SMS 결제 알림 리스너 — 사용자가 시스템 설정 → 알림 액세스 에서 직접 활성화 -->
+        <service
+            android:name=".data.sms.AssetCoachNotificationListener"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
 
     </application>
 </manifest>

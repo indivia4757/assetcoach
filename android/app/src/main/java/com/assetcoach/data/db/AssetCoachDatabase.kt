@@ -8,10 +8,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.assetcoach.data.db.dao.CategoryDao
 import com.assetcoach.data.db.dao.ChatDao
 import com.assetcoach.data.db.dao.TransactionDao
+import com.assetcoach.data.db.dao.UserProfileDao
 import com.assetcoach.data.db.entity.CategoryEntity
 import com.assetcoach.data.db.entity.ConversationEntity
 import com.assetcoach.data.db.entity.MessageEntity
 import com.assetcoach.data.db.entity.TransactionEntity
+import com.assetcoach.data.db.entity.UserProfileEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,9 +25,10 @@ import net.sqlcipher.database.SupportFactory
         TransactionEntity::class,
         CategoryEntity::class,
         ConversationEntity::class,
-        MessageEntity::class
+        MessageEntity::class,
+        UserProfileEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AssetCoachDatabase : RoomDatabase() {
@@ -33,6 +36,7 @@ abstract class AssetCoachDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun categoryDao(): CategoryDao
     abstract fun chatDao(): ChatDao
+    abstract fun userProfileDao(): UserProfileDao
 
     companion object {
         private const val DB_NAME = "assetcoach.enc.db"

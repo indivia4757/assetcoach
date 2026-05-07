@@ -3,6 +3,7 @@ package com.assetcoach
 import android.app.Application
 import com.assetcoach.data.db.AssetCoachDatabase
 import com.assetcoach.data.repo.TransactionRepository
+import com.assetcoach.data.repo.UserProfileRepository
 import com.assetcoach.security.AppLockManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,10 @@ class AssetCoachApp : Application() {
 
     val transactionRepository: TransactionRepository by lazy {
         TransactionRepository(database.transactionDao(), database.categoryDao())
+    }
+
+    val userProfileRepository: UserProfileRepository by lazy {
+        UserProfileRepository(database.userProfileDao())
     }
 
     override fun onCreate() {
