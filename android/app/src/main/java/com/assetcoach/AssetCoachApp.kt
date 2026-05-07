@@ -3,21 +3,21 @@ package com.assetcoach
 import android.app.Application
 import com.assetcoach.data.db.AssetCoachDatabase
 import com.assetcoach.data.repo.TransactionRepository
+import com.assetcoach.security.AppLockManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import net.sqlcipher.database.SQLiteDatabase
 
 /**
  * 앱 단 DI 컨테이너 (Hilt 없이 manual).
- *
- * Phase 2: DB + Repository
- * Phase 3: Gemma 4 추론 매니저, 캐시 매니저 추가
- * Phase 4: SMS 파서, WorkManager 스케줄
  */
 class AssetCoachApp : Application() {
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    val lockManager: AppLockManager = AppLockManager()
 
     val database: AssetCoachDatabase by lazy { AssetCoachDatabase.get(this) }
 
@@ -27,7 +27,10 @@ class AssetCoachApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // 첫 실행 시 sample CSV 자동 import
+        // SQLCipher native lib 로드 — DB 빌드 전 1회 필수
+        SQLiteDatabase.loadLibs(this)
+
+        // 첫 실행 시 sample CSV 자동 import — DB 가 비어있을 때만
         appScope.launch {
             transactionRepository.importSampleIfEmpty(this@AssetCoachApp)
         }

@@ -78,8 +78,13 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // SQLCipher 통합은 Phase 2.5 — 일반 Room 안정화 후 SupportFactory 추가
-    // implementation("net.zetetic:android-database-sqlcipher:4.5.4")
+    // ─────────────────────────────────────────────────────
+    // Phase 2.5 — Encryption + Biometric lock
+    // ─────────────────────────────────────────────────────
+    implementation(libs.sqlcipher.android)
+    implementation(libs.androidx.security.crypto)
+    implementation(libs.androidx.biometric)
+    implementation(libs.androidx.fragment.ktx)
 
     // ─────────────────────────────────────────────────────
     // Phase 3 — On-device LLM (uncomment when implementing)
