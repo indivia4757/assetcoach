@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.assetcoach.domain.model.HomeData
 import com.assetcoach.ui.screens.AnalysisScreen
 import com.assetcoach.ui.screens.ChatScreen
+import com.assetcoach.ui.screens.GoalsScreen
 import com.assetcoach.ui.screens.HomeScreen
 import com.assetcoach.ui.theme.AppType
 import com.assetcoach.ui.theme.Cream
@@ -104,7 +105,7 @@ fun AppNavigation(
             composable(AppTab.Chat.route) {
                 ChatScreen(segmentId = homeData.segmentId, nameLabel = homeData.nameLabel)
             }
-            composable(AppTab.Goals.route) { PlaceholderScreen("목표") }
+            composable(AppTab.Goals.route) { GoalsScreen() }
         }
     }
 }

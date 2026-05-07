@@ -1,6 +1,7 @@
 package com.assetcoach.data.repo
 
 import android.content.Context
+import com.assetcoach.data.csv.CsvImporter
 import com.assetcoach.data.csv.ShinhanCardParser
 import com.assetcoach.data.db.dao.CategoryDao
 import com.assetcoach.data.db.dao.CategorySumRow
@@ -27,6 +28,29 @@ class TransactionRepository(
         transactionDao.observeTotalSpendBetween(fromTs, toTs)
 
     suspend fun count(): Int = transactionDao.count()
+
+    /**
+     * Phase 6: CSV byte[] → 양식 자동 감지 → 파싱 → DB insert.
+     */
+    suspend fun importCsv(bytes: ByteArray): ImportOutcome {
+        return try {
+            val result = CsvImporter().import(bytes)
+            val deduped = markDuplicates(result.transactions)
+            transactionDao.insertAll(deduped)
+            ImportOutcome.Success(
+                inserted = deduped.size,
+                sourceTag = result.sourceTag,
+                charset = result.charset
+            )
+        } catch (e: Exception) {
+            ImportOutcome.Failure(e.message ?: "알 수 없는 오류")
+        }
+    }
+
+    sealed class ImportOutcome {
+        data class Success(val inserted: Int, val sourceTag: String, val charset: String) : ImportOutcome()
+        data class Failure(val message: String) : ImportOutcome()
+    }
 
     /**
      * 첫 실행 시 assets/sample CSV 자동 import.

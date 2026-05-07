@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.assetcoach.AssetCoachApp
-import com.assetcoach.ai.GemmaMockClient
 import com.assetcoach.ui.theme.AppType
 import com.assetcoach.ui.theme.Cream
 import com.assetcoach.ui.theme.CreamDeep
@@ -75,8 +74,8 @@ fun ChatScreen(segmentId: String, nameLabel: String) {
     val context = LocalContext.current
     val app = context.applicationContext as AssetCoachApp
 
-    // Mock 클라이언트 인스턴스 — Phase 3+ 에서 모델 가용 시 GemmaRealClient 로 분기
-    val gemma = remember { GemmaMockClient() }
+    // Phase 5: GemmaClientFactory 가 모델 가용성에 따라 Real/Mock 자동 선택
+    val gemma = remember { app.gemmaFactory.get() }
 
     val vm: ChatViewModel = viewModel(
         factory = ChatViewModel.Factory(gemma, app.transactionRepository, segmentId, nameLabel)

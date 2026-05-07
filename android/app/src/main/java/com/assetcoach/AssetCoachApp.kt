@@ -1,6 +1,8 @@
 package com.assetcoach
 
 import android.app.Application
+import com.assetcoach.ai.GemmaClientFactory
+import com.assetcoach.ai.ModelManager
 import com.assetcoach.data.db.AssetCoachDatabase
 import com.assetcoach.data.repo.TransactionRepository
 import com.assetcoach.data.repo.UserProfileRepository
@@ -29,6 +31,9 @@ class AssetCoachApp : Application() {
     val userProfileRepository: UserProfileRepository by lazy {
         UserProfileRepository(database.userProfileDao())
     }
+
+    val modelManager: ModelManager by lazy { ModelManager(this) }
+    val gemmaFactory: GemmaClientFactory by lazy { GemmaClientFactory(modelManager) }
 
     override fun onCreate() {
         super.onCreate()
